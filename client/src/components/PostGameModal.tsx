@@ -1,4 +1,4 @@
-import { Award, Handshake, RotateCcw } from 'lucide-react';
+import { Award, Brain, Handshake, RotateCcw } from 'lucide-react';
 import type { GameOverPayload } from '../types';
 
 const REASON_LABELS: Record<string, string> = {
@@ -17,12 +17,14 @@ export function PostGameModal({
   yourColor,
   onReturnToLobby,
   onClose,
+  onAiReview,
 }: {
   gameOver: GameOverPayload;
   currentUserId: string;
   yourColor?: 'w' | 'b' | null;
   onReturnToLobby: () => void;
   onClose: () => void;
+  onAiReview?: () => void;
 }) {
   const isDraw = gameOver.result === 'DRAW';
   const didWin = gameOver.winnerId === currentUserId;
@@ -65,20 +67,31 @@ export function PostGameModal({
           </div>
         )}
 
-        <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
-          <button
-            onClick={onReturnToLobby}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded border border-[#B59124] bg-[#D4AF37] px-4 py-2.5 text-sm font-semibold text-[#0D0F12] transition hover:bg-[#E5C158]"
-          >
-            <RotateCcw className="h-4 w-4" />
-            Back to Lobby
-          </button>
-          <button
-            onClick={onClose}
-            className="flex-1 rounded border border-[#2A313F] bg-[#1B202A] px-4 py-2.5 text-sm font-medium text-[#F5F0E6] transition hover:bg-[#232A36]"
-          >
-            Review Board
-          </button>
+        <div className="mt-6 flex flex-col gap-2.5">
+          {onAiReview && (
+            <button
+              onClick={onAiReview}
+              className="inline-flex w-full items-center justify-center gap-2 rounded border border-[#D4AF37]/60 bg-[#D4AF37]/15 px-4 py-2.5 text-sm font-semibold text-[#F5E199] transition hover:bg-[#D4AF37]/25"
+            >
+              <Brain className="h-4 w-4 text-[#D4AF37]" />
+              AI Game Review &amp; Mistakes
+            </button>
+          )}
+          <div className="flex flex-col gap-2.5 sm:flex-row">
+            <button
+              onClick={onReturnToLobby}
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded border border-[#B59124] bg-[#D4AF37] px-4 py-2.5 text-sm font-semibold text-[#0D0F12] transition hover:bg-[#E5C158]"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Back to Lobby
+            </button>
+            <button
+              onClick={onClose}
+              className="flex-1 rounded border border-[#2A313F] bg-[#1B202A] px-4 py-2.5 text-sm font-medium text-[#F5F0E6] transition hover:bg-[#232A36]"
+            >
+              Review Board
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -14,12 +14,16 @@ import {
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { useNavigate, useParams } from 'react-router-dom';
+import { AiReviewPanel } from '../components/AiReviewPanel';
 import { CapturedPieces } from '../components/CapturedPieces';
 import { Chessboard3D, type LegalTarget } from '../components/Chessboard3D';
 import { GameChat } from '../components/GameChat';
 import { MoveHistory } from '../components/MoveHistory';
 import { PostGameModal } from '../components/PostGameModal';
 import { useAuth } from '../context/AuthContext';
+import { analyzeGameHistory, type GameReviewReport } from '../lib/chessAi';
+import { detectOpening } from '../lib/openings';
+import { saveMistakePuzzles } from '../lib/puzzles';
 import {
   FALLBACK_THEMES,
   fetchArenaThemes,
@@ -53,6 +57,9 @@ export function GameRoomPage() {
   const [moveError, setMoveError] = useState('');
   const [copied, setCopied] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [reviewReport, setReviewReport] = useState<GameReviewReport | null>(null);
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [viewMode, setViewMode] = useState<ArenaViewMode>(getStoredViewMode);
@@ -672,6 +679,13 @@ export function GameRoomPage() {
 
           <MoveHistory history={snapshot.history} />
 
+          {snapshot.history.length > 0 && (
+            <div className="rounded border border-[#2A313F] bg-[#151921] px-3 py-2 text-xs text-[#9CA3AF]">
+              <span className="font-semibold text-[#D4AF37]">Opening: </span>
+              {detectOpening(snapshot.history)?.name ?? 'Custom / Out of Book'}
+            </div>
+          )}
+
           <GameChat
             messages={snapshot.messages}
             currentUserId={user.id}
@@ -689,8 +703,28 @@ export function GameRoomPage() {
           yourColor={snapshot.yourColor}
           onReturnToLobby={() => navigate('/lobby')}
           onClose={() => setShowModal(false)}
+          onAiReview={() => {
+            setShowModal(false);
+            setReviewOpen(true);
+            setIsAnalyzing(true);
+            window.setTimeout(() => {
+              const report = analyzeGameHistory(snapshot.history);
+              setReviewReport(report);
+              if (report.mistakePuzzles.length > 0) {
+                saveMistakePuzzles(report.mistakePuzzles);
+              }
+              setIsAnalyzing(false);
+            }, 80);
+          }}
         />
       )}
+
+      <AiReviewPanel
+        isOpen={reviewOpen}
+        onClose={() => setReviewOpen(false)}
+        report={reviewReport}
+        isAnalyzing={isAnalyzing}
+      />
     </div>
   );
 }

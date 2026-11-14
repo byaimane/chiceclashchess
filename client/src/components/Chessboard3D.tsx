@@ -19,6 +19,7 @@ interface Chessboard3DProps {
   arenaBg: string;
   selectedSquare: Square | null;
   legalTargets: LegalTarget[];
+  hintSquares?: { from: string; to: string } | null;
   onSquareClick: (square: Square) => void;
 }
 
@@ -141,6 +142,7 @@ export function Chessboard3D({
   arenaBg,
   selectedSquare,
   legalTargets,
+  hintSquares,
   onSquareClick,
 }: Chessboard3DProps) {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -428,7 +430,26 @@ export function Chessboard3D({
       marker.position.set(x, 0.012, z);
       ctx.highlightsGroup.add(marker);
     }
-  }, [selectedSquare, legalTargets]);
+
+    if (hintSquares) {
+      for (const sq of [hintSquares.from, hintSquares.to]) {
+        const { fileIdx, rankIdx } = squareToCoords(sq);
+        const [x, z] = coordsToPosition(fileIdx, rankIdx);
+        const hintMesh = new THREE.Mesh(
+          new THREE.PlaneGeometry(0.92, 0.92),
+          new THREE.MeshBasicMaterial({
+            color: 0xd4af37,
+            transparent: true,
+            opacity: 0.52,
+            side: THREE.DoubleSide,
+          })
+        );
+        hintMesh.rotation.x = -Math.PI / 2;
+        hintMesh.position.set(x, 0.01, z);
+        ctx.highlightsGroup.add(hintMesh);
+      }
+    }
+  }, [selectedSquare, legalTargets, hintSquares]);
 
   return (
     <div className="relative overflow-hidden" style={{ width: boardWidth, height: boardWidth }}>

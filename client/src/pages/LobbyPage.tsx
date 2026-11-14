@@ -1,5 +1,6 @@
 import {
   Award,
+  Bot,
   Check,
   KeyRound,
   Loader2,
@@ -7,6 +8,7 @@ import {
   Palette,
   Plus,
   Swords,
+  Target,
   Trophy,
   Users,
   X,
@@ -248,6 +250,55 @@ export function LobbyPage() {
           {bannerConfig.message}
         </div>
       )}
+
+      {/* AI Training & Solo Arena */}
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <button
+          type="button"
+          onClick={() => navigate('/ai')}
+          className="flex items-center justify-between rounded border border-[#D4AF37]/40 bg-[#151921] p-4 text-left transition hover:border-[#D4AF37] hover:bg-[#1B202A]"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded border border-[#D4AF37]/40 bg-[#D4AF37]/15 text-[#D4AF37]">
+              <Bot className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="text-sm font-bold text-[#F5F0E6]">
+                Play vs. ChoiceCLASH AI
+              </div>
+              <div className="text-xs text-[#9CA3AF]">
+                4 ELO levels, Live Eval Bar, Smart Hints &amp; AI Coach
+              </div>
+            </div>
+          </div>
+          <span className="rounded bg-[#D4AF37] px-2.5 py-1 text-xs font-semibold text-[#0D0F12]">
+            Play
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => navigate('/puzzles')}
+          className="flex items-center justify-between rounded border border-[#2A313F] bg-[#151921] p-4 text-left transition hover:border-[#D4AF37]/60 hover:bg-[#1B202A]"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded border border-[#D4AF37]/30 bg-[#1B202A] text-[#D4AF37]">
+              <Target className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="text-sm font-bold text-[#F5F0E6]">
+                AI Puzzles &amp; Mistake Trainer
+              </div>
+              <div className="text-xs text-[#9CA3AF]">
+                Daily tactics &amp; retry blunders from your reviewed games
+              </div>
+            </div>
+          </div>
+          <span className="rounded border border-[#2A313F] bg-[#1B202A] px-2.5 py-1 text-xs font-semibold text-[#F5E199]">
+            Train
+          </span>
+        </button>
+      </div>
 
       {/* User Panel: Playing Arena Theme Selector */}
       <div className="mt-6 rounded border border-[#2A313F] bg-[#151921] p-5">

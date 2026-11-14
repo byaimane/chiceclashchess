@@ -5,10 +5,12 @@ import { Navbar } from './components/Navbar';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
+import { AiArenaPage } from './pages/AiArenaPage';
 import { GameRoomPage } from './pages/GameRoomPage';
 import { LandingPage } from './pages/LandingPage';
 import { LobbyPage } from './pages/LobbyPage';
 import { LoginPage } from './pages/LoginPage';
+import { PuzzlesPage } from './pages/PuzzlesPage';
 import { SignupPage } from './pages/SignupPage';
 
 export default function App() {
@@ -20,6 +22,8 @@ export default function App() {
           <main className="flex-1">
             <Routes>
               <Route path="/" element={<LandingPage />} />
+              <Route path="/ai" element={<AiArenaPage />} />
+              <Route path="/puzzles" element={<PuzzlesPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
               <Route

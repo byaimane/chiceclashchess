@@ -1,4 +1,4 @@
-import { LogOut, Menu, Shield, Trophy, X } from 'lucide-react';
+import { Bot, LogOut, Menu, Shield, Target, Trophy, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -35,6 +35,20 @@ export function Navbar() {
 
         {/* Desktop Nav */}
         <nav className="hidden items-center gap-3 sm:flex">
+          <Link
+            to="/ai"
+            className="inline-flex items-center gap-1.5 rounded border border-transparent px-3 py-1.5 text-sm font-medium text-[#F5F0E6] transition hover:border-[#2A313F] hover:bg-[#1B202A]"
+          >
+            <Bot className="h-4 w-4 text-[#D4AF37]" />
+            Play AI
+          </Link>
+          <Link
+            to="/puzzles"
+            className="inline-flex items-center gap-1.5 rounded border border-transparent px-3 py-1.5 text-sm font-medium text-[#F5F0E6] transition hover:border-[#2A313F] hover:bg-[#1B202A]"
+          >
+            <Target className="h-4 w-4 text-[#D4AF37]" />
+            Puzzles
+          </Link>
           <InstallAppButton />
           {user ? (
             <>
@@ -100,7 +114,23 @@ export function Navbar() {
       {/* Mobile Dropdown */}
       {mobileOpen && (
         <div className="border-t border-[#2A313F] bg-[#151921] px-4 py-3 sm:hidden">
-          <div className="mb-2">
+          <div className="mb-2 flex flex-col gap-2">
+            <Link
+              to="/ai"
+              onClick={() => setMobileOpen(false)}
+              className="inline-flex items-center gap-2 rounded border border-[#2A313F] bg-[#1B202A] px-3 py-2 text-sm font-medium text-[#F5F0E6]"
+            >
+              <Bot className="h-4 w-4 text-[#D4AF37]" />
+              Play vs. AI
+            </Link>
+            <Link
+              to="/puzzles"
+              onClick={() => setMobileOpen(false)}
+              className="inline-flex items-center gap-2 rounded border border-[#2A313F] bg-[#1B202A] px-3 py-2 text-sm font-medium text-[#F5F0E6]"
+            >
+              <Target className="h-4 w-4 text-[#D4AF37]" />
+              AI Puzzles
+            </Link>
             <InstallAppButton
               className="w-full justify-center py-2"
               onAction={() => setMobileOpen(false)}
