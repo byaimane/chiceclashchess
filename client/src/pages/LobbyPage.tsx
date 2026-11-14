@@ -1,9 +1,11 @@
 import {
   Award,
+  Check,
   DollarSign,
   KeyRound,
   Loader2,
   LogOut,
+  Palette,
   Plus,
   Swords,
   Trophy,
@@ -14,9 +16,24 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { apiRequest } from '../lib/api';
+import {
+  FALLBACK_THEMES,
+  fetchArenaThemes,
+  fetchEnabledPlugins,
+  getStoredThemeSlug,
+  parsePluginConfig,
+  savePreferredTheme,
+  setStoredThemeSlug,
+} from '../lib/arenaConfig';
 import { formatUsd, getLevelInfo } from '../lib/progression';
 import { getSocket } from '../lib/socket';
-import type { MatchHistoryItem, OnlineUser, PayoutRequest } from '../types';
+import type {
+  ArenaTheme,
+  MatchHistoryItem,
+  OnlineUser,
+  PayoutRequest,
+  PluginItem,
+} from '../types';
 
 export function LobbyPage() {
   const { user, logout, refreshUser } = useAuth();
@@ -37,8 +54,18 @@ export function LobbyPage() {
   const [redeemSuccess, setRedeemSuccess] = useState('');
   const [redeeming, setRedeeming] = useState(false);
 
+  // Arena Themes & Plugins
+  const [themes, setThemes] = useState<ArenaTheme[]>(FALLBACK_THEMES);
+  const [selectedTheme, setSelectedTheme] = useState<string>(
+    user?.preferredThemeSlug || getStoredThemeSlug()
+  );
+  const [savingTheme, setSavingTheme] = useState(false);
+  const [plugins, setPlugins] = useState<PluginItem[]>([]);
+
   useEffect(() => {
     refreshUser();
+    fetchArenaThemes().then(setThemes);
+    fetchEnabledPlugins().then(setPlugins);
     apiRequest<{ games: MatchHistoryItem[] }>('/api/games/history')
       .then((res) => setHistory(res.games))
       .catch(() => {});
@@ -46,6 +73,29 @@ export function LobbyPage() {
       .then((res) => setPayouts(res.payouts))
       .catch(() => {});
   }, [refreshUser]);
+
+  useEffect(() => {
+    if (user?.preferredThemeSlug) {
+      setSelectedTheme(user.preferredThemeSlug);
+      setStoredThemeSlug(user.preferredThemeSlug);
+    }
+  }, [user?.preferredThemeSlug]);
+
+  const handleSelectTheme = async (slug: string) => {
+    setSelectedTheme(slug);
+    setSavingTheme(true);
+    try {
+      await savePreferredTheme(slug);
+      await refreshUser();
+    } catch {
+      // Stored locally even if offline
+    } finally {
+      setSavingTheme(false);
+    }
+  };
+
+  const bannerPlugin = plugins.find((p) => p.slug === 'arena-banner');
+  const bannerConfig = parsePluginConfig(bannerPlugin, { message: '', tone: 'info' });
 
   useEffect(() => {
     const socket = getSocket();
@@ -231,6 +281,65 @@ export function LobbyPage() {
               style={{ width: `${levelInfo.progressPct}%` }}
             />
           </div>
+        </div>
+      </div>
+
+      {/* Plugin Announcement Banner */}
+      {bannerPlugin && bannerConfig.message && (
+        <div className="mt-4 rounded border border-[#1B5E3A]/30 bg-[#1B5E3A]/10 px-4 py-2.5 text-sm font-medium text-[#1B5E3A]">
+          {bannerConfig.message}
+        </div>
+      )}
+
+      {/* User Panel: Playing Arena Theme Selector */}
+      <div className="mt-6 rounded border border-[#DDD6C8] bg-white p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Palette className="h-4 w-4 text-[#1B5E3A]" />
+            <h2 className="font-editorial text-lg font-bold text-[#1C1917]">
+              Playing Arena Theme
+            </h2>
+          </div>
+          <span className="text-xs text-[#57534E]">
+            {savingTheme ? 'Saving preference...' : 'Choose your 2D board & arena style'}
+          </span>
+        </div>
+
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {themes.map((t) => {
+            const active = selectedTheme === t.slug;
+            return (
+              <button
+                key={t.slug}
+                type="button"
+                onClick={() => handleSelectTheme(t.slug)}
+                className={`flex items-center justify-between gap-3 rounded border p-3 text-left transition ${
+                  active
+                    ? 'border-[#1B5E3A] bg-[#1B5E3A]/5 ring-1 ring-[#1B5E3A]'
+                    : 'border-[#DDD6C8] bg-[#FAF8F4] hover:border-[#1B5E3A]/50'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="grid h-10 w-10 shrink-0 grid-cols-2 grid-rows-2 border-2"
+                    style={{ borderColor: t.boardBorder }}
+                  >
+                    <div style={{ backgroundColor: t.lightSquare }} />
+                    <div style={{ backgroundColor: t.darkSquare }} />
+                    <div style={{ backgroundColor: t.darkSquare }} />
+                    <div style={{ backgroundColor: t.lightSquare }} />
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-[#1C1917]">{t.name}</div>
+                    <div className="text-[11px] text-[#57534E] line-clamp-1">
+                      {t.description || 'Custom 2D arena theme'}
+                    </div>
+                  </div>
+                </div>
+                {active && <Check className="h-4 w-4 shrink-0 text-[#1B5E3A]" />}
+              </button>
+            );
+          })}
         </div>
       </div>
 

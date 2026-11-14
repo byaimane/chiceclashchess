@@ -2,16 +2,20 @@ import {
   Ban,
   CheckCircle2,
   DollarSign,
+  Palette,
+  Plug,
+  Plus,
   RefreshCw,
   Shield,
+  Star,
   Trash2,
   Users,
 } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { apiRequest } from '../lib/api';
 import { formatUsd } from '../lib/progression';
-import type { PayoutRequest, User } from '../types';
+import type { ArenaTheme, PayoutRequest, PluginItem, User } from '../types';
 
 interface AdminOverview {
   totalUsers: number;
@@ -43,15 +47,37 @@ interface ActiveRoomInfo {
 
 export function AdminDashboardPage() {
   const { user: currentUser } = useAuth();
-  const [tab, setTab] = useState<'users' | 'games' | 'payouts'>('users');
+  const [tab, setTab] = useState<'users' | 'games' | 'payouts' | 'themes' | 'plugins'>('users');
   const [overview, setOverview] = useState<AdminOverview | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [games, setGames] = useState<AdminGame[]>([]);
   const [rooms, setRooms] = useState<ActiveRoomInfo[]>([]);
   const [payouts, setPayouts] = useState<PayoutRequest[]>([]);
+  const [themes, setThemes] = useState<ArenaTheme[]>([]);
+  const [plugins, setPlugins] = useState<PluginItem[]>([]);
   const [search, setSearch] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+
+  const [newTheme, setNewTheme] = useState({
+    name: '',
+    description: '',
+    lightSquare: '#EEEED2',
+    darkSquare: '#769656',
+    boardBorder: '#1C1917',
+    arenaBg: '#F6F3EC',
+    accentColor: '#1B5E3A',
+  });
+
+  const [newPlugin, setNewPlugin] = useState({
+    name: '',
+    slug: '',
+    category: 'gameplay',
+    version: '1.0.0',
+    description: '',
+    configJson: '{}',
+  });
+  const [pluginConfigs, setPluginConfigs] = useState<Record<string, string>>({});
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editStats, setEditStats] = useState({
@@ -66,18 +92,25 @@ export function AdminDashboardPage() {
     setLoading(true);
     setError('');
     try {
-      const [ov, us, gm, rm, py] = await Promise.all([
+      const [ov, us, gm, rm, py, th, pl] = await Promise.all([
         apiRequest<AdminOverview>('/api/admin/overview'),
         apiRequest<{ users: User[] }>('/api/admin/users'),
         apiRequest<{ games: AdminGame[] }>('/api/admin/games'),
         apiRequest<{ rooms: ActiveRoomInfo[] }>('/api/admin/rooms'),
         apiRequest<{ payouts: PayoutRequest[] }>('/api/admin/payouts'),
+        apiRequest<{ themes: ArenaTheme[] }>('/api/admin/themes'),
+        apiRequest<{ plugins: PluginItem[] }>('/api/admin/plugins'),
       ]);
       setOverview(ov);
       setUsers(us.users);
       setGames(gm.games);
       setRooms(rm.rooms);
       setPayouts(py.payouts);
+      setThemes(th.themes);
+      setPlugins(pl.plugins);
+      setPluginConfigs(
+        Object.fromEntries(pl.plugins.map((item) => [item.id, item.configJson || '{}']))
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load admin data.');
     } finally {
@@ -282,6 +315,28 @@ export function AdminDashboardPage() {
         >
           <DollarSign className="h-4 w-4" />
           Payouts ({payouts.length})
+        </button>
+        <button
+          onClick={() => setTab('themes')}
+          className={`inline-flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition ${
+            tab === 'themes'
+              ? 'border-[#1B5E3A] text-[#1B5E3A]'
+              : 'border-transparent text-[#57534E] hover:text-[#1C1917]'
+          }`}
+        >
+          <Palette className="h-4 w-4" />
+          Themes ({themes.length})
+        </button>
+        <button
+          onClick={() => setTab('plugins')}
+          className={`inline-flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition ${
+            tab === 'plugins'
+              ? 'border-[#1B5E3A] text-[#1B5E3A]'
+              : 'border-transparent text-[#57534E] hover:text-[#1C1917]'
+          }`}
+        >
+          <Plug className="h-4 w-4" />
+          Plugins ({plugins.length})
         </button>
       </div>
 
@@ -633,6 +688,399 @@ export function AdminDashboardPage() {
               )}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {tab === 'themes' && (
+        <div className="mt-6 space-y-6">
+          {/* Create Theme Form */}
+          <form
+            onSubmit={async (e: FormEvent) => {
+              e.preventDefault();
+              setError('');
+              try {
+                await apiRequest('/api/admin/themes', {
+                  method: 'POST',
+                  body: JSON.stringify(newTheme),
+                });
+                setNewTheme({
+                  name: '',
+                  description: '',
+                  lightSquare: '#EEEED2',
+                  darkSquare: '#769656',
+                  boardBorder: '#1C1917',
+                  arenaBg: '#F6F3EC',
+                  accentColor: '#1B5E3A',
+                });
+                await loadAll();
+              } catch (err) {
+                setError(err instanceof Error ? err.message : 'Failed to create theme.');
+              }
+            }}
+            className="rounded border border-[#DDD6C8] bg-white p-5"
+          >
+            <h2 className="font-editorial text-lg font-bold text-[#1C1917]">
+              Add New Arena Theme
+            </h2>
+            <p className="mt-0.5 text-xs text-[#57534E]">
+              Create custom 2D board and arena color themes that players can select in their User Panel.
+            </p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div>
+                <label className="block text-xs font-semibold text-[#57534E]">Theme Name</label>
+                <input
+                  type="text"
+                  required
+                  value={newTheme.name}
+                  onChange={(e) => setNewTheme((p) => ({ ...p, name: e.target.value }))}
+                  placeholder="e.g. Emerald Classic"
+                  className="mt-1 w-full rounded border border-[#D6CEC0] px-3 py-2 text-sm text-[#1C1917]"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-semibold text-[#57534E]">Description</label>
+                <input
+                  type="text"
+                  value={newTheme.description}
+                  onChange={(e) => setNewTheme((p) => ({ ...p, description: e.target.value }))}
+                  placeholder="Short description for players"
+                  className="mt-1 w-full rounded border border-[#D6CEC0] px-3 py-2 text-sm text-[#1C1917]"
+                />
+              </div>
+              {(
+                [
+                  ['lightSquare', 'Light Square'],
+                  ['darkSquare', 'Dark Square'],
+                  ['boardBorder', 'Board Border'],
+                  ['arenaBg', 'Arena Background'],
+                  ['accentColor', 'Accent Color'],
+                ] as const
+              ).map(([field, label]) => (
+                <div key={field}>
+                  <label className="block text-xs font-semibold text-[#57534E]">{label}</label>
+                  <div className="mt-1 flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={newTheme[field]}
+                      onChange={(e) => setNewTheme((p) => ({ ...p, [field]: e.target.value }))}
+                      className="h-9 w-12 cursor-pointer rounded border border-[#D6CEC0] bg-white p-0.5"
+                    />
+                    <input
+                      type="text"
+                      value={newTheme[field]}
+                      onChange={(e) => setNewTheme((p) => ({ ...p, [field]: e.target.value }))}
+                      className="w-full rounded border border-[#D6CEC0] px-2.5 py-1.5 font-mono text-xs text-[#1C1917]"
+                    />
+                  </div>
+                </div>
+              ))}
+              <div className="flex items-end gap-3">
+                <div
+                  className="grid h-10 w-10 shrink-0 grid-cols-2 grid-rows-2 border-2"
+                  style={{ borderColor: newTheme.boardBorder }}
+                >
+                  <div style={{ backgroundColor: newTheme.lightSquare }} />
+                  <div style={{ backgroundColor: newTheme.darkSquare }} />
+                  <div style={{ backgroundColor: newTheme.darkSquare }} />
+                  <div style={{ backgroundColor: newTheme.lightSquare }} />
+                </div>
+                <button
+                  type="submit"
+                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded border border-[#14472B] bg-[#1B5E3A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#14472B]"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Theme
+                </button>
+              </div>
+            </div>
+          </form>
+
+          {/* Themes List */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {themes.map((t) => (
+              <div
+                key={t.id}
+                className="flex flex-col justify-between rounded border border-[#DDD6C8] bg-white p-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="grid h-12 w-12 shrink-0 grid-cols-2 grid-rows-2 border-2"
+                      style={{ borderColor: t.boardBorder }}
+                    >
+                      <div style={{ backgroundColor: t.lightSquare }} />
+                      <div style={{ backgroundColor: t.darkSquare }} />
+                      <div style={{ backgroundColor: t.darkSquare }} />
+                      <div style={{ backgroundColor: t.lightSquare }} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5 font-semibold text-[#1C1917]">
+                        {t.name}
+                        {t.isDefault && (
+                          <span className="rounded bg-[#1B5E3A]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#1B5E3A]">
+                            DEFAULT
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-0.5 text-xs text-[#57534E]">{t.description}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-[#EDE7DC] pt-3">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        await apiRequest(`/api/admin/themes/${t.id}`, {
+                          method: 'PATCH',
+                          body: JSON.stringify({ isActive: !t.isActive }),
+                        });
+                        await loadAll();
+                      }}
+                      className={`rounded border px-2.5 py-1 text-xs font-semibold ${
+                        t.isActive
+                          ? 'border-[#1B5E3A]/30 bg-[#1B5E3A]/10 text-[#1B5E3A]'
+                          : 'border-[#D6CEC0] bg-[#F6F3EC] text-[#57534E]'
+                      }`}
+                    >
+                      {t.isActive ? 'Active' : 'Hidden'}
+                    </button>
+                    {!t.isDefault && (
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          await apiRequest(`/api/admin/themes/${t.id}`, {
+                            method: 'PATCH',
+                            body: JSON.stringify({ isDefault: true }),
+                          });
+                          await loadAll();
+                        }}
+                        className="inline-flex items-center gap-1 rounded border border-[#D6CEC0] bg-white px-2.5 py-1 text-xs font-medium text-[#1C1917] hover:bg-[#FAF8F4]"
+                      >
+                        <Star className="h-3 w-3" />
+                        Set Default
+                      </button>
+                    )}
+                  </div>
+                  {!t.isDefault && (
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        await apiRequest(`/api/admin/themes/${t.id}`, { method: 'DELETE' });
+                        await loadAll();
+                      }}
+                      className="rounded border border-red-300 bg-red-50 p-1.5 text-red-700 hover:bg-red-100"
+                      title="Delete theme"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {tab === 'plugins' && (
+        <div className="mt-6 space-y-6">
+          {/* Add Plugin Form */}
+          <form
+            onSubmit={async (e: FormEvent) => {
+              e.preventDefault();
+              setError('');
+              try {
+                await apiRequest('/api/admin/plugins', {
+                  method: 'POST',
+                  body: JSON.stringify(newPlugin),
+                });
+                setNewPlugin({
+                  name: '',
+                  slug: '',
+                  category: 'gameplay',
+                  version: '1.0.0',
+                  description: '',
+                  configJson: '{}',
+                });
+                await loadAll();
+              } catch (err) {
+                setError(err instanceof Error ? err.message : 'Failed to add plugin.');
+              }
+            }}
+            className="rounded border border-[#DDD6C8] bg-white p-5"
+          >
+            <h2 className="font-editorial text-lg font-bold text-[#1C1917]">
+              Register Integrated Plugin
+            </h2>
+            <p className="mt-0.5 text-xs text-[#57534E]">
+              Add and configure platform plugins (UI modules, sound effects, banners, or gameplay extensions).
+            </p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div>
+                <label className="block text-xs font-semibold text-[#57534E]">Plugin Name</label>
+                <input
+                  type="text"
+                  required
+                  value={newPlugin.name}
+                  onChange={(e) => setNewPlugin((p) => ({ ...p, name: e.target.value }))}
+                  placeholder="e.g. Tournament Clock"
+                  className="mt-1 w-full rounded border border-[#D6CEC0] px-3 py-2 text-sm text-[#1C1917]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#57534E]">Slug (optional)</label>
+                <input
+                  type="text"
+                  value={newPlugin.slug}
+                  onChange={(e) => setNewPlugin((p) => ({ ...p, slug: e.target.value }))}
+                  placeholder="tournament-clock"
+                  className="mt-1 w-full rounded border border-[#D6CEC0] px-3 py-2 font-mono text-sm text-[#1C1917]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#57534E]">Category</label>
+                <select
+                  value={newPlugin.category}
+                  onChange={(e) => setNewPlugin((p) => ({ ...p, category: e.target.value }))}
+                  className="mt-1 w-full rounded border border-[#D6CEC0] bg-white px-3 py-2 text-sm text-[#1C1917]"
+                >
+                  <option value="gameplay">gameplay</option>
+                  <option value="ui">ui</option>
+                  <option value="moderation">moderation</option>
+                  <option value="analytics">analytics</option>
+                  <option value="payments">payments</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#57534E]">Version</label>
+                <input
+                  type="text"
+                  value={newPlugin.version}
+                  onChange={(e) => setNewPlugin((p) => ({ ...p, version: e.target.value }))}
+                  className="mt-1 w-full rounded border border-[#D6CEC0] px-3 py-2 font-mono text-sm text-[#1C1917]"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-semibold text-[#57534E]">Description</label>
+                <input
+                  type="text"
+                  value={newPlugin.description}
+                  onChange={(e) => setNewPlugin((p) => ({ ...p, description: e.target.value }))}
+                  placeholder="What this plugin integrates or controls"
+                  className="mt-1 w-full rounded border border-[#D6CEC0] px-3 py-2 text-sm text-[#1C1917]"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-semibold text-[#57534E]">Config JSON</label>
+                <div className="mt-1 flex gap-2">
+                  <input
+                    type="text"
+                    value={newPlugin.configJson}
+                    onChange={(e) => setNewPlugin((p) => ({ ...p, configJson: e.target.value }))}
+                    className="w-full rounded border border-[#D6CEC0] px-3 py-2 font-mono text-xs text-[#1C1917]"
+                  />
+                  <button
+                    type="submit"
+                    className="inline-flex shrink-0 items-center gap-1.5 rounded border border-[#14472B] bg-[#1B5E3A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#14472B]"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add Plugin
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+
+          {/* Plugins List */}
+          <div className="grid gap-4 md:grid-cols-2">
+            {plugins.map((pl) => (
+              <div
+                key={pl.id}
+                className="flex flex-col justify-between rounded border border-[#DDD6C8] bg-white p-4"
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-[#1C1917]">{pl.name}</span>
+                        <span className="rounded border border-[#DDD6C8] bg-[#F6F3EC] px-1.5 py-0.5 font-mono text-[10px] uppercase text-[#57534E]">
+                          {pl.category} · v{pl.version}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-[#57534E]">{pl.description}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        await apiRequest(`/api/admin/plugins/${pl.id}`, {
+                          method: 'PATCH',
+                          body: JSON.stringify({ enabled: !pl.enabled }),
+                        });
+                        await loadAll();
+                      }}
+                      className={`shrink-0 rounded border px-2.5 py-1 text-xs font-semibold ${
+                        pl.enabled
+                          ? 'border-[#1B5E3A]/30 bg-[#1B5E3A]/10 text-[#1B5E3A]'
+                          : 'border-[#D6CEC0] bg-[#F6F3EC] text-[#57534E]'
+                      }`}
+                    >
+                      {pl.enabled ? 'Enabled' : 'Disabled'}
+                    </button>
+                  </div>
+
+                  <div className="mt-3">
+                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#57534E]">
+                      Plugin Configuration (JSON)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={pluginConfigs[pl.id] ?? pl.configJson}
+                      onChange={(e) =>
+                        setPluginConfigs((prev) => ({ ...prev, [pl.id]: e.target.value }))
+                      }
+                      className="mt-1 w-full rounded border border-[#D6CEC0] bg-[#FAF8F4] p-2 font-mono text-xs text-[#1C1917]"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-3 flex items-center justify-between gap-2 border-t border-[#EDE7DC] pt-3">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setError('');
+                      try {
+                        await apiRequest(`/api/admin/plugins/${pl.id}`, {
+                          method: 'PATCH',
+                          body: JSON.stringify({
+                            configJson: pluginConfigs[pl.id] ?? pl.configJson,
+                          }),
+                        });
+                        await loadAll();
+                      } catch (err) {
+                        setError(err instanceof Error ? err.message : 'Invalid JSON config.');
+                      }
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded border border-[#14472B] bg-[#1B5E3A] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#14472B]"
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    Save Config
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await apiRequest(`/api/admin/plugins/${pl.id}`, { method: 'DELETE' });
+                      await loadAll();
+                    }}
+                    className="rounded border border-red-300 bg-red-50 p-1.5 text-red-700 hover:bg-red-100"
+                    title="Delete plugin"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

@@ -19,9 +19,10 @@ model User {
   draws          Int             @default(0)
   xp             Int             @default(0)
   points         Int             @default(0)
-  level          Int             @default(1)
-  walletCents    Int             @default(0)
-  gamesAsWhite   Game[]          @relation("WhitePlayer")
+  level              Int             @default(1)
+  walletCents        Int             @default(0)
+  preferredThemeSlug String          @default("classic-green")
+  gamesAsWhite       Game[]          @relation("WhitePlayer")
   gamesAsBlack   Game[]          @relation("BlackPlayer")
   payoutRequests PayoutRequest[]
   createdAt      DateTime        @default(now())
@@ -63,4 +64,32 @@ model Game {
   @@index([roomCode])
   @@index([whitePlayerId])
   @@index([blackPlayerId])
+}
+
+model ArenaTheme {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String   @default("")
+  lightSquare String
+  darkSquare  String
+  boardBorder String   @default("#1C1917")
+  arenaBg     String   @default("#F6F3EC")
+  accentColor String   @default("#1B5E3A")
+  isActive    Boolean  @default(true)
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Plugin {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String   @default("")
+  category    String   @default("gameplay")
+  version     String   @default("1.0.0")
+  enabled     Boolean  @default(true)
+  configJson  String   @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

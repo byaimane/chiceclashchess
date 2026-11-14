@@ -277,4 +277,218 @@ router.patch('/payouts/:id', async (req, res) => {
   }
 });
 
+// --- Arena Themes Management ---
+router.get('/themes', async (_req, res) => {
+  try {
+    const themes = await prisma.arenaTheme.findMany({
+      orderBy: [{ isDefault: 'desc' }, { createdAt: 'asc' }],
+    });
+    res.json({ themes });
+  } catch (err) {
+    console.error('Admin themes error:', err);
+    res.status(500).json({ error: 'Failed to load arena themes.' });
+  }
+});
+
+router.post('/themes', async (req, res) => {
+  try {
+    const name = String(req.body?.name ?? '').trim();
+    const rawSlug = String(req.body?.slug ?? name)
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+    const description = String(req.body?.description ?? '').trim();
+    const lightSquare = String(req.body?.lightSquare ?? '#EEEED2').trim();
+    const darkSquare = String(req.body?.darkSquare ?? '#769656').trim();
+    const boardBorder = String(req.body?.boardBorder ?? '#1C1917').trim();
+    const arenaBg = String(req.body?.arenaBg ?? '#F6F3EC').trim();
+    const accentColor = String(req.body?.accentColor ?? '#1B5E3A').trim();
+
+    if (!name || !rawSlug) {
+      res.status(400).json({ error: 'Theme name is required.' });
+      return;
+    }
+
+    const existing = await prisma.arenaTheme.findUnique({ where: { slug: rawSlug } });
+    if (existing) {
+      res.status(409).json({ error: 'A theme with that slug already exists.' });
+      return;
+    }
+
+    const theme = await prisma.arenaTheme.create({
+      data: {
+        slug: rawSlug,
+        name,
+        description,
+        lightSquare,
+        darkSquare,
+        boardBorder,
+        arenaBg,
+        accentColor,
+        isActive: true,
+        isDefault: false,
+      },
+    });
+    res.status(201).json({ theme });
+  } catch (err) {
+    console.error('Admin create theme error:', err);
+    res.status(500).json({ error: 'Failed to create arena theme.' });
+  }
+});
+
+router.patch('/themes/:id', async (req, res) => {
+  try {
+    const id = String(req.params.id);
+    const data: Record<string, unknown> = {};
+    if (typeof req.body?.name === 'string') data.name = req.body.name.trim();
+    if (typeof req.body?.description === 'string') data.description = req.body.description.trim();
+    if (typeof req.body?.lightSquare === 'string') data.lightSquare = req.body.lightSquare.trim();
+    if (typeof req.body?.darkSquare === 'string') data.darkSquare = req.body.darkSquare.trim();
+    if (typeof req.body?.boardBorder === 'string') data.boardBorder = req.body.boardBorder.trim();
+    if (typeof req.body?.arenaBg === 'string') data.arenaBg = req.body.arenaBg.trim();
+    if (typeof req.body?.accentColor === 'string') data.accentColor = req.body.accentColor.trim();
+    if (typeof req.body?.isActive === 'boolean') data.isActive = req.body.isActive;
+
+    if (req.body?.isDefault === true) {
+      await prisma.arenaTheme.updateMany({ data: { isDefault: false } });
+      data.isDefault = true;
+      data.isActive = true;
+    }
+
+    const theme = await prisma.arenaTheme.update({
+      where: { id },
+      data,
+    });
+    res.json({ theme });
+  } catch (err) {
+    console.error('Admin update theme error:', err);
+    res.status(500).json({ error: 'Failed to update arena theme.' });
+  }
+});
+
+router.delete('/themes/:id', async (req, res) => {
+  try {
+    const id = String(req.params.id);
+    const theme = await prisma.arenaTheme.findUnique({ where: { id } });
+    if (!theme) {
+      res.status(404).json({ error: 'Theme not found.' });
+      return;
+    }
+    if (theme.isDefault) {
+      res.status(400).json({ error: 'Cannot delete the default theme.' });
+      return;
+    }
+    await prisma.arenaTheme.delete({ where: { id } });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Admin delete theme error:', err);
+    res.status(500).json({ error: 'Failed to delete arena theme.' });
+  }
+});
+
+// --- Integrated Plugins Management ---
+router.get('/plugins', async (_req, res) => {
+  try {
+    const plugins = await prisma.plugin.findMany({
+      orderBy: { createdAt: 'asc' },
+    });
+    res.json({ plugins });
+  } catch (err) {
+    console.error('Admin plugins error:', err);
+    res.status(500).json({ error: 'Failed to load plugins.' });
+  }
+});
+
+router.post('/plugins', async (req, res) => {
+  try {
+    const name = String(req.body?.name ?? '').trim();
+    const rawSlug = String(req.body?.slug ?? name)
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+    const description = String(req.body?.description ?? '').trim();
+    const category = String(req.body?.category ?? 'gameplay').trim();
+    const version = String(req.body?.version ?? '1.0.0').trim();
+    const enabled = req.body?.enabled !== false;
+    const configJson = String(req.body?.configJson ?? '{}').trim() || '{}';
+
+    if (!name || !rawSlug) {
+      res.status(400).json({ error: 'Plugin name is required.' });
+      return;
+    }
+
+    try {
+      JSON.parse(configJson);
+    } catch {
+      res.status(400).json({ error: 'Plugin configuration must be valid JSON.' });
+      return;
+    }
+
+    const existing = await prisma.plugin.findUnique({ where: { slug: rawSlug } });
+    if (existing) {
+      res.status(409).json({ error: 'A plugin with that slug already exists.' });
+      return;
+    }
+
+    const plugin = await prisma.plugin.create({
+      data: {
+        slug: rawSlug,
+        name,
+        description,
+        category,
+        version,
+        enabled,
+        configJson,
+      },
+    });
+    res.status(201).json({ plugin });
+  } catch (err) {
+    console.error('Admin create plugin error:', err);
+    res.status(500).json({ error: 'Failed to create plugin.' });
+  }
+});
+
+router.patch('/plugins/:id', async (req, res) => {
+  try {
+    const id = String(req.params.id);
+    const data: Record<string, unknown> = {};
+    if (typeof req.body?.name === 'string') data.name = req.body.name.trim();
+    if (typeof req.body?.description === 'string') data.description = req.body.description.trim();
+    if (typeof req.body?.category === 'string') data.category = req.body.category.trim();
+    if (typeof req.body?.version === 'string') data.version = req.body.version.trim();
+    if (typeof req.body?.enabled === 'boolean') data.enabled = req.body.enabled;
+    if (typeof req.body?.configJson === 'string') {
+      try {
+        JSON.parse(req.body.configJson);
+      } catch {
+        res.status(400).json({ error: 'Plugin configuration must be valid JSON.' });
+        return;
+      }
+      data.configJson = req.body.configJson;
+    }
+
+    const plugin = await prisma.plugin.update({
+      where: { id },
+      data,
+    });
+    res.json({ plugin });
+  } catch (err) {
+    console.error('Admin update plugin error:', err);
+    res.status(500).json({ error: 'Failed to update plugin.' });
+  }
+});
+
+router.delete('/plugins/:id', async (req, res) => {
+  try {
+    const id = String(req.params.id);
+    await prisma.plugin.delete({ where: { id } });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Admin delete plugin error:', err);
+    res.status(500).json({ error: 'Failed to delete plugin.' });
+  }
+});
+
 export default router;

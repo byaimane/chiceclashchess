@@ -11,7 +11,33 @@ export interface User {
   points: number;
   level: number;
   walletCents: number;
+  preferredThemeSlug?: string;
   createdAt?: string;
+}
+
+export interface ArenaTheme {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  lightSquare: string;
+  darkSquare: string;
+  boardBorder: string;
+  arenaBg: string;
+  accentColor: string;
+  isActive: boolean;
+  isDefault: boolean;
+}
+
+export interface PluginItem {
+  id: string;
+  slug: string;
+  name: string;
+  description?: string;
+  category: string;
+  version: string;
+  enabled: boolean;
+  configJson: string;
 }
 
 export interface PayoutRequest {

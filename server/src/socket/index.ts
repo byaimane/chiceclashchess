@@ -26,7 +26,7 @@ function broadcastRoomState(io: Server, room: ActiveRoom): void {
 export function setupSocketServer(httpServer: HttpServer): Server {
   const io = new Server(httpServer, {
     cors: {
-      origin: env.clientUrl,
+      origin: env.allowedOrigins,
       methods: ['GET', 'POST'],
       credentials: true,
     },

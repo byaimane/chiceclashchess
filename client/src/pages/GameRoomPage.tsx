@@ -4,6 +4,8 @@ import {
   Copy,
   Flag,
   Handshake,
+  Maximize2,
+  Minimize2,
   ShieldAlert,
   Wifi,
   WifiOff,
@@ -16,8 +18,24 @@ import { GameChat } from '../components/GameChat';
 import { MoveHistory } from '../components/MoveHistory';
 import { PostGameModal } from '../components/PostGameModal';
 import { useAuth } from '../context/AuthContext';
+import {
+  FALLBACK_THEMES,
+  fetchArenaThemes,
+  fetchEnabledPlugins,
+  getStoredThemeSlug,
+  parsePluginConfig,
+  playChessSound,
+  savePreferredTheme,
+  setStoredThemeSlug,
+} from '../lib/arenaConfig';
 import { getSocket } from '../lib/socket';
-import type { ChatMessage, GameOverPayload, RoomSnapshot } from '../types';
+import type {
+  ArenaTheme,
+  ChatMessage,
+  GameOverPayload,
+  PluginItem,
+  RoomSnapshot,
+} from '../types';
 
 export function GameRoomPage() {
   const { roomId } = useParams<{ roomId: string }>();
@@ -31,23 +49,110 @@ export function GameRoomPage() {
   const [copied, setCopied] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [themes, setThemes] = useState<ArenaTheme[]>(FALLBACK_THEMES);
+  const [themeSlug, setThemeSlug] = useState<string>(
+    user?.preferredThemeSlug || getStoredThemeSlug()
+  );
+  const [plugins, setPlugins] = useState<PluginItem[]>([]);
+  const prevHistoryLenRef = useRef<number>(0);
+  const arenaRef = useRef<HTMLDivElement>(null);
   const boardContainerRef = useRef<HTMLDivElement>(null);
   const [boardWidth, setBoardWidth] = useState(560);
+
+  useEffect(() => {
+    fetchArenaThemes().then(setThemes);
+    fetchEnabledPlugins().then(setPlugins);
+  }, []);
+
+  useEffect(() => {
+    if (user?.preferredThemeSlug) {
+      setThemeSlug(user.preferredThemeSlug);
+      setStoredThemeSlug(user.preferredThemeSlug);
+    }
+  }, [user?.preferredThemeSlug]);
+
+  const activeTheme = useMemo(
+    () =>
+      themes.find((t) => t.slug === themeSlug) ||
+      themes.find((t) => t.isDefault) ||
+      FALLBACK_THEMES[0],
+    [themes, themeSlug]
+  );
+
+  const coordPlugin = plugins.find((p) => p.slug === 'board-coordinates');
+  const coordConfig = parsePluginConfig(coordPlugin, { showNotation: true });
+  const showBoardNotation = coordPlugin ? coordConfig.showNotation !== false : true;
+
+  const soundPlugin = plugins.find((p) => p.slug === 'move-sounds');
+  const soundConfig = parsePluginConfig(soundPlugin, { volume: 0.5 });
+
+  const bannerPlugin = plugins.find((p) => p.slug === 'arena-banner');
+  const bannerConfig = parsePluginConfig(bannerPlugin, { message: '' });
+
+  const handleThemeChange = async (slug: string) => {
+    setThemeSlug(slug);
+    try {
+      await savePreferredTheme(slug);
+      refreshUser();
+    } catch {
+      // Saved locally
+    }
+  };
+
+  useEffect(() => {
+    const onFsChange = () => {
+      if (!document.fullscreenElement) {
+        setIsFullscreen(false);
+      }
+    };
+    document.addEventListener('fullscreenchange', onFsChange);
+    return () => document.removeEventListener('fullscreenchange', onFsChange);
+  }, []);
+
+  const toggleFullscreen = async () => {
+    if (!isFullscreen) {
+      setIsFullscreen(true);
+      try {
+        if (arenaRef.current?.requestFullscreen) {
+          await arenaRef.current.requestFullscreen();
+        }
+      } catch {
+        // Fallback to CSS fixed fullscreen (e.g., iOS Safari)
+      }
+    } else {
+      setIsFullscreen(false);
+      try {
+        if (document.fullscreenElement && document.exitFullscreen) {
+          await document.exitFullscreen();
+        }
+      } catch {
+        // Ignore exit errors
+      }
+    }
+  };
 
   useEffect(() => {
     const el = boardContainerRef.current;
     if (!el) return;
 
     const updateWidth = () => {
-      const width = Math.min(580, Math.max(260, Math.floor(el.clientWidth - 4)));
+      const maxCap = isFullscreen
+        ? Math.min(720, Math.max(260, window.innerHeight - 175))
+        : 580;
+      const width = Math.min(maxCap, Math.max(260, Math.floor(el.clientWidth - 4)));
       setBoardWidth(width);
     };
 
     updateWidth();
     const observer = new ResizeObserver(updateWidth);
     observer.observe(el);
-    return () => observer.disconnect();
-  }, [snapshot !== null]);
+    window.addEventListener('resize', updateWidth);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', updateWidth);
+    };
+  }, [snapshot !== null, isFullscreen]);
 
   useEffect(() => {
     if (!roomCode) return;
@@ -55,6 +160,17 @@ export function GameRoomPage() {
 
     const onRoomState = (data: RoomSnapshot) => {
       if (data.roomCode !== roomCode) return;
+      if (soundPlugin && data.history.length > prevHistoryLenRef.current) {
+        const lastMove = data.history[data.history.length - 1] || '';
+        if (data.inCheck) {
+          playChessSound('check', Number(soundConfig.volume) || 0.5);
+        } else if (lastMove.includes('x')) {
+          playChessSound('capture', Number(soundConfig.volume) || 0.5);
+        } else {
+          playChessSound('move', Number(soundConfig.volume) || 0.5);
+        }
+      }
+      prevHistoryLenRef.current = data.history.length;
       setSnapshot(data);
       setSelectedSquare(null);
       if (data.gameOver) {
@@ -300,8 +416,64 @@ export function GameRoomPage() {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         {/* Flat 2D Board Column */}
-        <div className="flex flex-col items-center">
-          <div ref={boardContainerRef} className="w-full max-w-[584px]">
+        <div
+          ref={arenaRef}
+          style={isFullscreen ? { backgroundColor: activeTheme.arenaBg } : undefined}
+          className={
+            isFullscreen
+              ? 'fixed inset-0 z-50 flex flex-col items-center justify-center overflow-y-auto p-3 sm:p-6'
+              : 'flex flex-col items-center'
+          }
+        >
+          <div
+            ref={boardContainerRef}
+            className={`w-full ${isFullscreen ? 'max-w-[724px]' : 'max-w-[584px]'}`}
+          >
+            {bannerPlugin && bannerConfig.message && (
+              <div className="mb-2 rounded border border-[#1B5E3A]/30 bg-[#1B5E3A]/10 px-3 py-1.5 text-center text-xs font-medium text-[#1B5E3A]">
+                {bannerConfig.message}
+              </div>
+            )}
+
+            {/* Arena Controls Bar */}
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <span className="font-mono text-xs font-semibold text-[#57534E]">
+                ARENA · {snapshot.roomCode}
+              </span>
+              <div className="flex items-center gap-2">
+                <select
+                  value={activeTheme.slug}
+                  onChange={(e) => handleThemeChange(e.target.value)}
+                  aria-label="Select Arena Theme"
+                  className="rounded border border-[#D6CEC0] bg-white px-2 py-1 text-xs font-medium text-[#1C1917] focus:border-[#1B5E3A] focus:outline-none"
+                >
+                  {themes.map((t) => (
+                    <option key={t.slug} value={t.slug}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={toggleFullscreen}
+                  className="inline-flex items-center gap-1.5 rounded border border-[#D6CEC0] bg-white px-2.5 py-1 text-xs font-semibold text-[#1C1917] transition hover:bg-[#FAF8F4]"
+                  aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen arena'}
+                >
+                  {isFullscreen ? (
+                    <>
+                      <Minimize2 className="h-3.5 w-3.5 text-[#1B5E3A]" />
+                      Exit Fullscreen
+                    </>
+                  ) : (
+                    <>
+                      <Maximize2 className="h-3.5 w-3.5 text-[#1B5E3A]" />
+                      Fullscreen Arena
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
             {/* Top Player Bar */}
             <div className="mb-2 flex items-center justify-between rounded border border-[#DDD6C8] bg-white px-4 py-2.5">
               <div className="flex items-center gap-2.5">
@@ -333,20 +505,24 @@ export function GameRoomPage() {
             </div>
 
             {/* Flat 2D Chessboard */}
-            <div className="touch-none select-none border-2 border-[#1C1917] bg-white">
+            <div
+              className="touch-none select-none border-2 bg-white"
+              style={{ borderColor: activeTheme.boardBorder }}
+            >
               <Chessboard
                 id="multiplayer-board"
                 boardWidth={boardWidth}
                 position={snapshot.fen}
                 boardOrientation={boardOrientation}
+                showBoardNotation={showBoardNotation}
                 onPieceDrop={onPieceDrop}
                 onPieceDragBegin={onPieceDragBegin}
                 onSquareClick={onSquareClick}
                 customSquareStyles={optionSquares}
                 arePiecesDraggable={isMyTurn}
                 customBoardStyle={{ borderRadius: '0px', boxShadow: 'none', cursor: isMyTurn ? 'pointer' : 'default' }}
-                customDarkSquareStyle={{ backgroundColor: '#769656' }}
-                customLightSquareStyle={{ backgroundColor: '#EEEED2' }}
+                customDarkSquareStyle={{ backgroundColor: activeTheme.darkSquare }}
+                customLightSquareStyle={{ backgroundColor: activeTheme.lightSquare }}
                 animationDuration={120}
               />
             </div>

@@ -2,6 +2,7 @@ import { LogOut, Menu, Shield, Trophy, X } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { InstallAppButton } from './InstallAppButton';
 
 export function Navbar() {
   const { user, logout } = useAuth();
@@ -34,6 +35,7 @@ export function Navbar() {
 
         {/* Desktop Nav */}
         <nav className="hidden items-center gap-3 sm:flex">
+          <InstallAppButton />
           {user ? (
             <>
               <Link
@@ -98,6 +100,12 @@ export function Navbar() {
       {/* Mobile Dropdown */}
       {mobileOpen && (
         <div className="border-t border-[#DDD6C8] bg-[#FAF8F4] px-4 py-3 sm:hidden">
+          <div className="mb-2">
+            <InstallAppButton
+              className="w-full justify-center py-2"
+              onAction={() => setMobileOpen(false)}
+            />
+          </div>
           {user ? (
             <div className="flex flex-col gap-2">
               <div className="pb-1 text-xs text-[#57534E]">

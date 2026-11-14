@@ -23,6 +23,7 @@ function sanitizeUser(user: {
   points: number;
   level: number;
   walletCents: number;
+  preferredThemeSlug: string;
   createdAt: Date;
 }) {
   return {
@@ -38,6 +39,7 @@ function sanitizeUser(user: {
     points: user.points,
     level: user.level,
     walletCents: user.walletCents,
+    preferredThemeSlug: user.preferredThemeSlug,
     createdAt: user.createdAt,
   };
 }
