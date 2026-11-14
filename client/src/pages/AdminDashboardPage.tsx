@@ -1,7 +1,6 @@
 import {
   Ban,
   CheckCircle2,
-  DollarSign,
   Palette,
   Plug,
   Plus,
@@ -14,15 +13,13 @@ import {
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { apiRequest } from '../lib/api';
-import { formatUsd } from '../lib/progression';
-import type { ArenaTheme, PayoutRequest, PluginItem, User } from '../types';
+import type { ArenaTheme, PluginItem, User } from '../types';
 
 interface AdminOverview {
   totalUsers: number;
   bannedUsers: number;
   totalGames: number;
   completedGames: number;
-  pendingPayouts: number;
   activeRooms: number;
 }
 
@@ -47,12 +44,11 @@ interface ActiveRoomInfo {
 
 export function AdminDashboardPage() {
   const { user: currentUser } = useAuth();
-  const [tab, setTab] = useState<'users' | 'games' | 'payouts' | 'themes' | 'plugins'>('users');
+  const [tab, setTab] = useState<'users' | 'games' | 'themes' | 'plugins'>('users');
   const [overview, setOverview] = useState<AdminOverview | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [games, setGames] = useState<AdminGame[]>([]);
   const [rooms, setRooms] = useState<ActiveRoomInfo[]>([]);
-  const [payouts, setPayouts] = useState<PayoutRequest[]>([]);
   const [themes, setThemes] = useState<ArenaTheme[]>([]);
   const [plugins, setPlugins] = useState<PluginItem[]>([]);
   const [search, setSearch] = useState('');
@@ -92,12 +88,11 @@ export function AdminDashboardPage() {
     setLoading(true);
     setError('');
     try {
-      const [ov, us, gm, rm, py, th, pl] = await Promise.all([
+      const [ov, us, gm, rm, th, pl] = await Promise.all([
         apiRequest<AdminOverview>('/api/admin/overview'),
         apiRequest<{ users: User[] }>('/api/admin/users'),
         apiRequest<{ games: AdminGame[] }>('/api/admin/games'),
         apiRequest<{ rooms: ActiveRoomInfo[] }>('/api/admin/rooms'),
-        apiRequest<{ payouts: PayoutRequest[] }>('/api/admin/payouts'),
         apiRequest<{ themes: ArenaTheme[] }>('/api/admin/themes'),
         apiRequest<{ plugins: PluginItem[] }>('/api/admin/plugins'),
       ]);
@@ -105,7 +100,6 @@ export function AdminDashboardPage() {
       setUsers(us.users);
       setGames(gm.games);
       setRooms(rm.rooms);
-      setPayouts(py.payouts);
       setThemes(th.themes);
       setPlugins(pl.plugins);
       setPluginConfigs(
@@ -196,26 +190,6 @@ export function AdminDashboardPage() {
     }
   };
 
-  const handleProcessPayout = async (
-    payoutId: string,
-    status: 'APPROVED' | 'REJECTED'
-  ) => {
-    setError('');
-    try {
-      const res = await apiRequest<{ payout: PayoutRequest }>(
-        `/api/admin/payouts/${payoutId}`,
-        {
-          method: 'PATCH',
-          body: JSON.stringify({ status }),
-        }
-      );
-      setPayouts((prev) => prev.map((p) => (p.id === payoutId ? res.payout : p)));
-      await loadAll();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to process payout.');
-    }
-  };
-
   const filteredUsers = users.filter(
     (u) =>
       u.username.toLowerCase().includes(search.toLowerCase()) ||
@@ -253,7 +227,7 @@ export function AdminDashboardPage() {
 
       {/* Overview Stats */}
       {overview && (
-        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           <div className="rounded border border-[#2A313F] bg-[#151921] p-4">
             <div className="text-xs uppercase tracking-wider text-[#9CA3AF]">Users</div>
             <div className="mt-1 text-2xl font-bold text-[#F5F0E6]">{overview.totalUsers}</div>
@@ -273,10 +247,6 @@ export function AdminDashboardPage() {
           <div className="rounded border border-[#2A313F] bg-[#151921] p-4">
             <div className="text-xs uppercase tracking-wider text-[#9CA3AF]">Completed</div>
             <div className="mt-1 text-2xl font-bold text-[#7C4A2D]">{overview.completedGames}</div>
-          </div>
-          <div className="rounded border border-[#2A313F] bg-[#151921] p-4">
-            <div className="text-xs uppercase tracking-wider text-[#9CA3AF]">Pending Payouts</div>
-            <div className="mt-1 text-2xl font-bold text-amber-800">{overview.pendingPayouts}</div>
           </div>
         </div>
       )}
@@ -304,17 +274,6 @@ export function AdminDashboardPage() {
         >
           <Shield className="h-4 w-4" />
           Games &amp; Rooms ({games.length})
-        </button>
-        <button
-          onClick={() => setTab('payouts')}
-          className={`inline-flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition ${
-            tab === 'payouts'
-              ? 'border-[#D4AF37] text-[#D4AF37]'
-              : 'border-transparent text-[#9CA3AF] hover:text-[#F5F0E6]'
-          }`}
-        >
-          <DollarSign className="h-4 w-4" />
-          Payouts ({payouts.length})
         </button>
         <button
           onClick={() => setTab('themes')}
@@ -404,9 +363,6 @@ export function AdminDashboardPage() {
                       <td className="px-4 py-3 text-xs">
                         <div className="font-semibold text-[#F5F0E6]">
                           Lv.{u.level ?? 1} &middot; {u.points ?? 0} pts
-                        </div>
-                        <div className="text-[#9CA3AF]">
-                          Earned {formatUsd(u.walletCents ?? 0)}
                         </div>
                       </td>
                       <td className="px-4 py-3 font-mono text-xs">
@@ -621,73 +577,6 @@ export function AdminDashboardPage() {
               </table>
             </div>
           </div>
-        </div>
-      )}
-
-      {tab === 'payouts' && (
-        <div className="mt-6 overflow-x-auto rounded border border-[#2A313F] bg-[#151921]">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-[#2A313F] bg-[#1B202A] text-xs uppercase tracking-wider text-[#9CA3AF]">
-              <tr>
-                <th className="px-4 py-3">Player</th>
-                <th className="px-4 py-3">Amount</th>
-                <th className="px-4 py-3">Method &amp; Destination</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#EDE7DC]">
-              {payouts.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="px-4 py-6 text-center text-xs text-[#6B7280]">
-                    No payout requests submitted yet.
-                  </td>
-                </tr>
-              ) : (
-                payouts.map((p) => (
-                  <tr key={p.id}>
-                    <td className="px-4 py-3">
-                      <div className="font-semibold text-[#F5F0E6]">
-                        {p.user?.username ?? 'Unknown'}
-                      </div>
-                      <div className="text-xs text-[#9CA3AF]">{p.user?.email}</div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="font-semibold text-[#D4AF37]">
-                        {formatUsd(p.amountCents)}
-                      </div>
-                      <div className="text-xs text-[#9CA3AF]">{p.pointsSpent} pts</div>
-                    </td>
-                    <td className="px-4 py-3 text-xs">
-                      <div className="font-semibold text-[#F5F0E6]">{p.payoutMethod}</div>
-                      <div className="text-[#9CA3AF]">{p.destination}</div>
-                    </td>
-                    <td className="px-4 py-3 text-xs font-semibold">{p.status}</td>
-                    <td className="px-4 py-3 text-right">
-                      {p.status === 'PENDING' ? (
-                        <div className="inline-flex gap-2">
-                          <button
-                            onClick={() => handleProcessPayout(p.id, 'APPROVED')}
-                            className="rounded border border-[#B59124] bg-[#D4AF37] px-2.5 py-1 text-xs font-semibold text-[#0D0F12] hover:bg-[#E5C158]"
-                          >
-                            Approve
-                          </button>
-                          <button
-                            onClick={() => handleProcessPayout(p.id, 'REJECTED')}
-                            className="rounded border border-red-500/40 bg-red-950/50 px-2.5 py-1 text-xs font-medium text-red-200 hover:bg-red-100"
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-[#6B7280]">Processed</span>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
         </div>
       )}
 

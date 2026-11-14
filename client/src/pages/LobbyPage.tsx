@@ -1,7 +1,6 @@
 import {
   Award,
   Check,
-  DollarSign,
   KeyRound,
   Loader2,
   LogOut,
@@ -28,13 +27,12 @@ import {
   setStoredViewMode,
   type ArenaViewMode,
 } from '../lib/arenaConfig';
-import { formatUsd, getLevelInfo } from '../lib/progression';
+import { getLevelInfo } from '../lib/progression';
 import { getSocket } from '../lib/socket';
 import type {
   ArenaTheme,
   MatchHistoryItem,
   OnlineUser,
-  PayoutRequest,
   PluginItem,
 } from '../types';
 
@@ -48,14 +46,6 @@ export function LobbyPage() {
   const [creating, setCreating] = useState(false);
   const [history, setHistory] = useState<MatchHistoryItem[]>([]);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
-
-  // Rewards / Cash-Out state
-  const [payouts, setPayouts] = useState<PayoutRequest[]>([]);
-  const [redeemPoints, setRedeemPoints] = useState(500);
-  const [payoutMethod, setPayoutMethod] = useState('PayPal');
-  const [destination, setDestination] = useState('');
-  const [redeemSuccess, setRedeemSuccess] = useState('');
-  const [redeeming, setRedeeming] = useState(false);
 
   // Arena Themes & Plugins
   const [themes, setThemes] = useState<ArenaTheme[]>(FALLBACK_THEMES);
@@ -72,9 +62,6 @@ export function LobbyPage() {
     fetchEnabledPlugins().then(setPlugins);
     apiRequest<{ games: MatchHistoryItem[] }>('/api/games/history')
       .then((res) => setHistory(res.games))
-      .catch(() => {});
-    apiRequest<{ payouts: PayoutRequest[] }>('/api/rewards/payouts')
-      .then((res) => setPayouts(res.payouts))
       .catch(() => {});
   }, [refreshUser]);
 
@@ -180,33 +167,6 @@ export function LobbyPage() {
     );
   };
 
-  const handleRedeem = async (e: FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setRedeemSuccess('');
-    setRedeeming(true);
-    try {
-      const res = await apiRequest<{ payout: PayoutRequest }>('/api/rewards/redeem', {
-        method: 'POST',
-        body: JSON.stringify({
-          pointsSpent: Number(redeemPoints),
-          payoutMethod,
-          destination,
-        }),
-      });
-      setPayouts((prev) => [res.payout, ...prev]);
-      setDestination('');
-      setRedeemSuccess(
-        `Submitted ${formatUsd(res.payout.amountCents)} cash-out request (${res.payout.pointsSpent} pts).`
-      );
-      await refreshUser();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to redeem points.');
-    } finally {
-      setRedeeming(false);
-    }
-  };
-
   if (!user) return null;
 
   const otherOnlineUsers = onlineUsers.filter((u) => u.userId !== user.id);
@@ -249,12 +209,6 @@ export function LobbyPage() {
             <div className="rounded border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3.5 py-2 text-center">
               <div className="text-base font-bold text-[#D4AF37]">{user.points ?? 0}</div>
               <div className="text-[10px] uppercase tracking-wider text-[#D4AF37]">Points</div>
-            </div>
-            <div className="rounded border border-[#7C4A2D]/30 bg-[#7C4A2D]/10 px-3.5 py-2 text-center">
-              <div className="text-base font-bold text-[#7C4A2D]">
-                {formatUsd(user.walletCents ?? 0)}
-              </div>
-              <div className="text-[10px] uppercase tracking-wider text-[#7C4A2D]">Earned</div>
             </div>
             <button
               onClick={() => {
@@ -385,12 +339,6 @@ export function LobbyPage() {
         </div>
       )}
 
-      {redeemSuccess && (
-        <div className="mt-6 rounded border border-[#D4AF37]/40 bg-[#D4AF37]/10 px-4 py-3 text-sm text-[#D4AF37]">
-          {redeemSuccess}
-        </div>
-      )}
-
       {/* Play Actions */}
       <div className="mt-8 grid gap-6 md:grid-cols-3">
         <div className="flex flex-col justify-between rounded border border-[#D4AF37]/40 bg-[#151921] p-6">
@@ -469,125 +417,6 @@ export function LobbyPage() {
               Join
             </button>
           </form>
-        </div>
-      </div>
-
-      {/* Earn Money from Points */}
-      <div className="mt-8 rounded border border-[#2A313F] bg-[#151921] p-6">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#EDE7DC] pb-4">
-          <div className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5 text-[#D4AF37]" />
-            <div>
-              <h2 className="text-lg font-bold text-[#F5F0E6]">
-                Earn Money from Points
-              </h2>
-              <p className="text-xs text-[#9CA3AF]">
-                Rate: 100 Points = $0.10 &middot; Minimum cash-out: 500 Points ($0.50)
-              </p>
-            </div>
-          </div>
-          <div className="text-sm font-semibold text-[#F5F0E6]">
-            Available: <span className="text-[#D4AF37]">{user.points ?? 0} pts</span> (
-            {formatUsd(Math.floor((user.points ?? 0) / 10))})
-          </div>
-        </div>
-
-        <div className="mt-5 grid gap-6 lg:grid-cols-2">
-          <form onSubmit={handleRedeem} className="space-y-3">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
-                  Points to Convert
-                </label>
-                <input
-                  type="number"
-                  min={500}
-                  step={100}
-                  value={redeemPoints}
-                  onChange={(e) => setRedeemPoints(Number(e.target.value))}
-                  className="w-full rounded border border-[#2A313F] bg-[#0D0F12] px-3 py-2 text-sm text-[#F5F0E6] focus:border-[#D4AF37] focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
-                  Payout Method
-                </label>
-                <select
-                  value={payoutMethod}
-                  onChange={(e) => setPayoutMethod(e.target.value)}
-                  className="w-full rounded border border-[#2A313F] bg-[#0D0F12] px-3 py-2 text-sm text-[#F5F0E6] focus:border-[#D4AF37] focus:outline-none"
-                >
-                  <option value="PayPal">PayPal</option>
-                  <option value="Bank Transfer">Bank Transfer</option>
-                  <option value="Gift Card">Gift Card</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
-                Payout Email / Account
-              </label>
-              <input
-                type="text"
-                required
-                value={destination}
-                onChange={(e) => setDestination(e.target.value)}
-                placeholder="you@example.com or account ID"
-                className="w-full rounded border border-[#2A313F] bg-[#0D0F12] px-3 py-2 text-sm text-[#F5F0E6] placeholder:text-[#6B7280] focus:border-[#D4AF37] focus:outline-none"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={redeeming || (user.points ?? 0) < 500}
-              className="rounded border border-[#B59124] bg-[#D4AF37] px-5 py-2.5 text-sm font-semibold text-[#0D0F12] transition hover:bg-[#E5C158] disabled:opacity-50"
-            >
-              {redeeming
-                ? 'Submitting...'
-                : `Cash Out ${formatUsd(Math.floor(redeemPoints / 10))}`}
-            </button>
-          </form>
-
-          <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
-              Your Payout Requests
-            </h3>
-            {payouts.length === 0 ? (
-              <p className="mt-3 text-sm text-[#9CA3AF]">
-                No cash-out requests yet. Play matches to earn points!
-              </p>
-            ) : (
-              <div className="mt-3 divide-y divide-[#EDE7DC] rounded border border-[#2A313F] bg-[#0D0F12]">
-                {payouts.slice(0, 5).map((p) => (
-                  <div
-                    key={p.id}
-                    className="flex items-center justify-between gap-3 px-3 py-2.5 text-xs"
-                  >
-                    <div>
-                      <span className="font-semibold text-[#F5F0E6]">
-                        {formatUsd(p.amountCents)}
-                      </span>{' '}
-                      <span className="text-[#9CA3AF]">
-                        ({p.pointsSpent} pts &middot; {p.payoutMethod})
-                      </span>
-                    </div>
-                    <span
-                      className={`rounded border px-2 py-0.5 font-semibold ${
-                        p.status === 'APPROVED'
-                          ? 'border-[#D4AF37]/30 bg-[#D4AF37]/10 text-[#D4AF37]'
-                          : p.status === 'REJECTED'
-                          ? 'border-red-500/40 bg-red-950/50 text-red-200'
-                          : 'border-amber-600/30 bg-amber-50 text-amber-900'
-                      }`}
-                    >
-                      {p.status}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
