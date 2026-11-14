@@ -436,10 +436,10 @@ export function Chessboard3D({
       <button
         type="button"
         onClick={resetCamera}
-        className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded border border-[#D6CEC0] bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-[#1C1917] shadow-sm backdrop-blur transition hover:bg-white"
+        className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded border border-[#2A313F] bg-[#151921]/90 px-2.5 py-1 text-[11px] font-semibold text-[#F5F0E6] shadow-sm backdrop-blur transition hover:bg-[#151921]"
         title="Reset 3D camera angle"
       >
-        <RotateCcw className="h-3 w-3 text-[#1B5E3A]" />
+        <RotateCcw className="h-3 w-3 text-[#D4AF37]" />
         Reset View
       </button>
     </div>

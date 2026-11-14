@@ -341,13 +341,13 @@ export function GameRoomPage() {
   if (joinError) {
     return (
       <div className="mx-auto max-w-lg px-4 py-16 text-center">
-        <div className="rounded border border-red-300 bg-white p-8">
+        <div className="rounded border border-red-300 bg-[#151921] p-8">
           <ShieldAlert className="mx-auto h-10 w-10 text-red-700" />
-          <h2 className="mt-4 text-xl font-bold text-[#1C1917]">Unable to Join Room</h2>
-          <p className="mt-2 text-sm text-[#57534E]">{joinError}</p>
+          <h2 className="mt-4 text-xl font-bold text-[#F5F0E6]">Unable to Join Room</h2>
+          <p className="mt-2 text-sm text-[#9CA3AF]">{joinError}</p>
           <button
             onClick={() => navigate('/lobby')}
-            className="mt-6 rounded border border-[#14472B] bg-[#1B5E3A] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#14472B]"
+            className="mt-6 rounded border border-[#B59124] bg-[#D4AF37] px-5 py-2.5 text-sm font-semibold text-[#0D0F12] hover:bg-[#E5C158]"
           >
             Return to Lobby
           </button>
@@ -359,7 +359,7 @@ export function GameRoomPage() {
   if (!snapshot || !user) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-7 w-7 animate-spin rounded-full border-2 border-[#1B5E3A] border-t-transparent" />
+        <div className="h-7 w-7 animate-spin rounded-full border-2 border-[#D4AF37] border-t-transparent" />
       </div>
     );
   }
@@ -383,14 +383,14 @@ export function GameRoomPage() {
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       {/* Waiting Banner */}
       {snapshot.status === 'WAITING' && (
-        <div className="mb-6 flex flex-col items-start justify-between gap-4 rounded border border-[#1B5E3A]/40 bg-white p-4 sm:flex-row sm:items-center">
+        <div className="mb-6 flex flex-col items-start justify-between gap-4 rounded border border-[#D4AF37]/40 bg-[#151921] p-4 sm:flex-row sm:items-center">
           <div>
-            <p className="text-sm font-semibold text-[#1B5E3A]">
+            <p className="text-sm font-semibold text-[#D4AF37]">
               Waiting for opponent to join...
             </p>
-            <p className="mt-0.5 text-xs text-[#57534E]">
+            <p className="mt-0.5 text-xs text-[#9CA3AF]">
               Share room code{' '}
-              <span className="rounded border border-[#DDD6C8] bg-[#F6F3EC] px-2 py-0.5 font-mono font-bold text-[#1C1917]">
+              <span className="rounded border border-[#2A313F] bg-[#1B202A] px-2 py-0.5 font-mono font-bold text-[#F5F0E6]">
                 {snapshot.roomCode}
               </span>{' '}
               or copy the invite link.
@@ -398,7 +398,7 @@ export function GameRoomPage() {
           </div>
           <button
             onClick={handleCopyInvite}
-            className="inline-flex items-center gap-2 rounded border border-[#14472B] bg-[#1B5E3A] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#14472B]"
+            className="inline-flex items-center gap-2 rounded border border-[#B59124] bg-[#D4AF37] px-4 py-2 text-xs font-semibold text-[#0D0F12] transition hover:bg-[#E5C158]"
           >
             {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             {copied ? 'Link Copied!' : 'Copy Invite Link'}
@@ -417,7 +417,7 @@ export function GameRoomPage() {
               onClick={() =>
                 getSocket().emit('game:draw:respond', { roomCode, accept: true })
               }
-              className="rounded border border-[#14472B] bg-[#1B5E3A] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#14472B]"
+              className="rounded border border-[#B59124] bg-[#D4AF37] px-3.5 py-1.5 text-xs font-semibold text-[#0D0F12] hover:bg-[#E5C158]"
             >
               Accept Draw
             </button>
@@ -425,7 +425,7 @@ export function GameRoomPage() {
               onClick={() =>
                 getSocket().emit('game:draw:respond', { roomCode, accept: false })
               }
-              className="rounded border border-[#D6CEC0] bg-white px-3.5 py-1.5 text-xs font-medium text-[#1C1917] hover:bg-[#F6F3EC]"
+              className="rounded border border-[#2A313F] bg-[#151921] px-3.5 py-1.5 text-xs font-medium text-[#F5F0E6] hover:bg-[#1B202A]"
             >
               Decline
             </button>
@@ -449,25 +449,25 @@ export function GameRoomPage() {
             className={`w-full ${isFullscreen ? 'max-w-[724px]' : 'max-w-[584px]'}`}
           >
             {bannerPlugin && bannerConfig.message && (
-              <div className="mb-2 rounded border border-[#1B5E3A]/30 bg-[#1B5E3A]/10 px-3 py-1.5 text-center text-xs font-medium text-[#1B5E3A]">
+              <div className="mb-2 rounded border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3 py-1.5 text-center text-xs font-medium text-[#D4AF37]">
                 {bannerConfig.message}
               </div>
             )}
 
             {/* Arena Controls Bar */}
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-              <span className="font-mono text-xs font-semibold text-[#57534E]">
+              <span className="font-mono text-xs font-semibold text-[#9CA3AF]">
                 ARENA · {snapshot.roomCode}
               </span>
               <div className="flex flex-wrap items-center gap-2">
-                <div className="inline-flex overflow-hidden rounded border border-[#D6CEC0] bg-white">
+                <div className="inline-flex overflow-hidden rounded border border-[#2A313F] bg-[#151921]">
                   <button
                     type="button"
                     onClick={() => handleViewModeChange('2d')}
                     className={`px-2.5 py-1 text-xs font-semibold transition ${
                       viewMode === '2d'
-                        ? 'bg-[#1B5E3A] text-white'
-                        : 'text-[#1C1917] hover:bg-[#FAF8F4]'
+                        ? 'bg-[#D4AF37] text-[#0D0F12]'
+                        : 'text-[#F5F0E6] hover:bg-[#0D0F12]'
                     }`}
                   >
                     2D
@@ -477,8 +477,8 @@ export function GameRoomPage() {
                     onClick={() => handleViewModeChange('3d')}
                     className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold transition ${
                       viewMode === '3d'
-                        ? 'bg-[#1B5E3A] text-white'
-                        : 'text-[#1C1917] hover:bg-[#FAF8F4]'
+                        ? 'bg-[#D4AF37] text-[#0D0F12]'
+                        : 'text-[#F5F0E6] hover:bg-[#0D0F12]'
                     }`}
                   >
                     <Box className="h-3 w-3" />
@@ -489,7 +489,7 @@ export function GameRoomPage() {
                   value={activeTheme.slug}
                   onChange={(e) => handleThemeChange(e.target.value)}
                   aria-label="Select Arena Theme"
-                  className="rounded border border-[#D6CEC0] bg-white px-2 py-1 text-xs font-medium text-[#1C1917] focus:border-[#1B5E3A] focus:outline-none"
+                  className="rounded border border-[#2A313F] bg-[#151921] px-2 py-1 text-xs font-medium text-[#F5F0E6] focus:border-[#D4AF37] focus:outline-none"
                 >
                   {themes.map((t) => (
                     <option key={t.slug} value={t.slug}>
@@ -500,17 +500,17 @@ export function GameRoomPage() {
                 <button
                   type="button"
                   onClick={toggleFullscreen}
-                  className="inline-flex items-center gap-1.5 rounded border border-[#D6CEC0] bg-white px-2.5 py-1 text-xs font-semibold text-[#1C1917] transition hover:bg-[#FAF8F4]"
+                  className="inline-flex items-center gap-1.5 rounded border border-[#2A313F] bg-[#151921] px-2.5 py-1 text-xs font-semibold text-[#F5F0E6] transition hover:bg-[#0D0F12]"
                   aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen arena'}
                 >
                   {isFullscreen ? (
                     <>
-                      <Minimize2 className="h-3.5 w-3.5 text-[#1B5E3A]" />
+                      <Minimize2 className="h-3.5 w-3.5 text-[#D4AF37]" />
                       Exit Fullscreen
                     </>
                   ) : (
                     <>
-                      <Maximize2 className="h-3.5 w-3.5 text-[#1B5E3A]" />
+                      <Maximize2 className="h-3.5 w-3.5 text-[#D4AF37]" />
                       Fullscreen Arena
                     </>
                   )}
@@ -519,21 +519,21 @@ export function GameRoomPage() {
             </div>
 
             {/* Top Player Bar */}
-            <div className="mb-2 flex items-center justify-between rounded border border-[#DDD6C8] bg-white px-4 py-2.5">
+            <div className="mb-2 flex items-center justify-between rounded border border-[#2A313F] bg-[#151921] px-4 py-2.5">
               <div className="flex items-center gap-2.5">
                 <span
                   className={`h-3 w-3 rounded-full border ${
                     topColor === 'w'
-                      ? 'border-[#1C1917] bg-white'
-                      : 'border-[#1C1917] bg-[#1C1917]'
+                      ? 'border-[#D4AF37]/60 bg-[#151921]'
+                      : 'border-[#D4AF37]/60 bg-[#1C1917]'
                   }`}
                 />
-                <span className="font-semibold text-[#1C1917]">
+                <span className="font-semibold text-[#F5F0E6]">
                   {topPlayer?.username ?? 'Waiting for player...'}
                 </span>
                 {topPlayer &&
                   (topPlayer.connected ? (
-                    <Wifi className="h-3.5 w-3.5 text-[#1B5E3A]" />
+                    <Wifi className="h-3.5 w-3.5 text-[#D4AF37]" />
                   ) : (
                     <WifiOff className="h-3.5 w-3.5 text-red-700" />
                   ))}
@@ -541,7 +541,7 @@ export function GameRoomPage() {
               <div className="flex items-center gap-3">
                 <CapturedPieces fen={snapshot.fen} forColor={topColor} />
                 {snapshot.status === 'ACTIVE' && snapshot.turn === topColor && (
-                  <span className="rounded border border-[#1B5E3A]/30 bg-[#1B5E3A]/10 px-2 py-0.5 text-xs font-semibold text-[#1B5E3A]">
+                  <span className="rounded border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-2 py-0.5 text-xs font-semibold text-[#D4AF37]">
                     Turn
                   </span>
                 )}
@@ -550,7 +550,7 @@ export function GameRoomPage() {
 
             {/* 2D or 3D Chessboard */}
             <div
-              className="touch-none select-none border-2 bg-white"
+              className="touch-none select-none border-2 bg-[#151921]"
               style={{ borderColor: activeTheme.boardBorder }}
             >
               {viewMode === '3d' ? (
@@ -587,22 +587,22 @@ export function GameRoomPage() {
             </div>
 
             {/* Bottom Player Bar */}
-            <div className="mt-2 flex items-center justify-between rounded border border-[#DDD6C8] bg-white px-4 py-2.5">
+            <div className="mt-2 flex items-center justify-between rounded border border-[#2A313F] bg-[#151921] px-4 py-2.5">
               <div className="flex items-center gap-2.5">
                 <span
                   className={`h-3 w-3 rounded-full border ${
                     bottomColor === 'w'
-                      ? 'border-[#1C1917] bg-white'
-                      : 'border-[#1C1917] bg-[#1C1917]'
+                      ? 'border-[#D4AF37]/60 bg-[#151921]'
+                      : 'border-[#D4AF37]/60 bg-[#1C1917]'
                   }`}
                 />
-                <span className="font-semibold text-[#1C1917]">
+                <span className="font-semibold text-[#F5F0E6]">
                   {bottomPlayer?.username ?? 'Waiting...'}
                   {bottomPlayer?.userId === user.id && ' (You)'}
                 </span>
                 {bottomPlayer &&
                   (bottomPlayer.connected ? (
-                    <Wifi className="h-3.5 w-3.5 text-[#1B5E3A]" />
+                    <Wifi className="h-3.5 w-3.5 text-[#D4AF37]" />
                   ) : (
                     <WifiOff className="h-3.5 w-3.5 text-red-700" />
                   ))}
@@ -610,7 +610,7 @@ export function GameRoomPage() {
               <div className="flex items-center gap-3">
                 <CapturedPieces fen={snapshot.fen} forColor={bottomColor} />
                 {snapshot.status === 'ACTIVE' && snapshot.turn === bottomColor && (
-                  <span className="rounded border border-[#1B5E3A]/30 bg-[#1B5E3A]/10 px-2 py-0.5 text-xs font-semibold text-[#1B5E3A]">
+                  <span className="rounded border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-2 py-0.5 text-xs font-semibold text-[#D4AF37]">
                     Your Turn
                   </span>
                 )}
@@ -625,18 +625,18 @@ export function GameRoomPage() {
 
         {/* Side Panel */}
         <aside className="flex flex-col gap-4">
-          <div className="rounded border border-[#DDD6C8] bg-white p-4">
+          <div className="rounded border border-[#2A313F] bg-[#151921] p-4">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#57534E]">
+              <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
                 Room {snapshot.roomCode}
               </span>
               <span
                 className={`rounded border px-2 py-0.5 text-xs font-semibold ${
                   snapshot.status === 'ACTIVE'
-                    ? 'border-[#1B5E3A]/30 bg-[#1B5E3A]/10 text-[#1B5E3A]'
+                    ? 'border-[#D4AF37]/30 bg-[#D4AF37]/10 text-[#D4AF37]'
                     : snapshot.status === 'WAITING'
                     ? 'border-amber-600/30 bg-amber-50 text-amber-900'
-                    : 'border-[#DDD6C8] bg-[#F6F3EC] text-[#57534E]'
+                    : 'border-[#2A313F] bg-[#1B202A] text-[#9CA3AF]'
                 }`}
               >
                 {snapshot.status}
@@ -644,7 +644,7 @@ export function GameRoomPage() {
             </div>
 
             {snapshot.inCheck && snapshot.status === 'ACTIVE' && (
-              <div className="mt-2 rounded border border-red-300 bg-red-50 px-3 py-1.5 text-center text-xs font-semibold text-red-800">
+              <div className="mt-2 rounded border border-red-500/40 bg-red-950/50 px-3 py-1.5 text-center text-xs font-semibold text-red-200">
                 Check!
               </div>
             )}
@@ -654,14 +654,14 @@ export function GameRoomPage() {
                 <button
                   onClick={() => getSocket().emit('game:draw:offer', { roomCode })}
                   disabled={iOfferedDraw}
-                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded border border-[#D6CEC0] bg-[#F6F3EC] px-3 py-2 text-xs font-medium text-[#1C1917] transition hover:bg-[#EAE3D5] disabled:opacity-50"
+                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded border border-[#2A313F] bg-[#1B202A] px-3 py-2 text-xs font-medium text-[#F5F0E6] transition hover:bg-[#232A36] disabled:opacity-50"
                 >
                   <Handshake className="h-3.5 w-3.5" />
                   {iOfferedDraw ? 'Draw Offered' : 'Offer Draw'}
                 </button>
                 <button
                   onClick={() => getSocket().emit('game:resign', { roomCode })}
-                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded border border-red-300 bg-red-50 px-3 py-2 text-xs font-medium text-red-800 transition hover:bg-red-100"
+                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded border border-red-500/40 bg-red-950/50 px-3 py-2 text-xs font-medium text-red-200 transition hover:bg-red-100"
                 >
                   <Flag className="h-3.5 w-3.5" />
                   Resign

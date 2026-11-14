@@ -33,21 +33,21 @@ export function LoginPage() {
 
   return (
     <div className="mx-auto flex min-h-[calc(100vh-8rem)] max-w-md items-center px-4 py-12">
-      <div className="w-full rounded border border-[#DDD6C8] bg-white p-8">
-        <h1 className="text-2xl font-bold text-[#1C1917]">Log in to ChoiceCLASH</h1>
-        <p className="mt-1.5 text-sm text-[#57534E]">
+      <div className="w-full rounded border border-[#2A313F] bg-[#151921] p-8 shadow-xl">
+        <h1 className="text-2xl font-bold text-[#F5F0E6]">Log in to ChoiceCLASH</h1>
+        <p className="mt-1.5 text-sm text-[#9CA3AF]">
           Enter your email or username to step into the lobby.
         </p>
 
         {error && (
-          <div className="mt-4 rounded border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
+          <div className="mt-4 rounded border border-red-500/40 bg-red-950/50 px-4 py-3 text-sm text-red-200">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[#57534E]">
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
               Email or Username
             </label>
             <input
@@ -56,12 +56,12 @@ export function LoginPage() {
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               placeholder="player@example.com"
-              className="w-full rounded border border-[#D6CEC0] bg-[#FAF8F4] px-3.5 py-2.5 text-sm text-[#1C1917] placeholder:text-[#78716C] focus:border-[#1B5E3A] focus:outline-none"
+              className="w-full rounded border border-[#2A313F] bg-[#0D0F12] px-3.5 py-2.5 text-sm text-[#F5F0E6] placeholder:text-[#6B7280] focus:border-[#D4AF37] focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[#57534E]">
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
               Password
             </label>
             <input
@@ -70,22 +70,22 @@ export function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full rounded border border-[#D6CEC0] bg-[#FAF8F4] px-3.5 py-2.5 text-sm text-[#1C1917] placeholder:text-[#78716C] focus:border-[#1B5E3A] focus:outline-none"
+              className="w-full rounded border border-[#2A313F] bg-[#0D0F12] px-3.5 py-2.5 text-sm text-[#F5F0E6] placeholder:text-[#6B7280] focus:border-[#D4AF37] focus:outline-none"
             />
           </div>
 
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded border border-[#14472B] bg-[#1B5E3A] py-2.5 text-sm font-semibold text-white transition hover:bg-[#14472B] disabled:opacity-50"
+            className="w-full rounded border border-[#B59124] bg-[#D4AF37] py-2.5 text-sm font-semibold text-[#0D0F12] transition hover:bg-[#E5C158] disabled:opacity-50"
           >
             {submitting ? 'Signing in...' : 'Log In'}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-[#57534E]">
+        <p className="mt-6 text-center text-sm text-[#9CA3AF]">
           New to ChoiceCLASH?{' '}
-          <Link to="/signup" className="font-semibold text-[#1B5E3A] hover:underline">
+          <Link to="/signup" className="font-semibold text-[#D4AF37] hover:underline">
             Create an account
           </Link>
         </p>

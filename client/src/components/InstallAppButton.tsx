@@ -75,43 +75,43 @@ export function InstallAppButton({
       <button
         type="button"
         onClick={handleClick}
-        className={`inline-flex items-center gap-1.5 rounded border border-[#14472B] bg-[#1B5E3A] px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-[#14472B] ${className}`}
+        className={`inline-flex items-center gap-1.5 rounded border border-[#B59124] bg-[#D4AF37] px-3 py-1.5 text-sm font-semibold text-[#0D0F12] transition hover:bg-[#E5C158] ${className}`}
       >
         <Download className="h-4 w-4" />
         Install App
       </button>
 
       {showIosGuide && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-sm rounded border border-[#DDD6C8] bg-white p-5 shadow-lg">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-sm rounded border border-[#2A313F] bg-[#151921] p-5 shadow-xl">
             <div className="flex items-center justify-between">
-              <h3 className="font-editorial text-lg font-bold text-[#1C1917]">
+              <h3 className="font-editorial text-lg font-bold text-[#F5F0E6]">
                 Install ChoiceCLASH
               </h3>
               <button
                 type="button"
                 onClick={() => setShowIosGuide(false)}
-                className="rounded p-1 text-[#57534E] hover:bg-[#F6F3EC]"
+                className="rounded p-1 text-[#9CA3AF] hover:bg-[#1B202A]"
                 aria-label="Close"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <p className="mt-2 text-sm text-[#57534E]">
+            <p className="mt-2 text-sm text-[#9CA3AF]">
               Install ChoiceCLASH on your iPhone or iPad for full-screen play:
             </p>
-            <ol className="mt-3 space-y-2 text-sm text-[#1C1917]">
+            <ol className="mt-3 space-y-2 text-sm text-[#F5F0E6]">
               <li className="flex items-center gap-2">
-                <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#1B5E3A] text-xs font-bold text-white">
+                <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#D4AF37] text-xs font-bold text-[#0D0F12]">
                   1
                 </span>
                 <span>
-                  Tap the <Share className="mx-0.5 inline h-4 w-4 text-[#1B5E3A]" />{' '}
+                  Tap the <Share className="mx-0.5 inline h-4 w-4 text-[#D4AF37]" />{' '}
                   <strong>Share</strong> button in Safari.
                 </span>
               </li>
               <li className="flex items-center gap-2">
-                <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#1B5E3A] text-xs font-bold text-white">
+                <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#D4AF37] text-xs font-bold text-[#0D0F12]">
                   2
                 </span>
                 <span>
@@ -125,7 +125,7 @@ export function InstallAppButton({
                 setShowIosGuide(false);
                 onAction?.();
               }}
-              className="mt-4 w-full rounded border border-[#14472B] bg-[#1B5E3A] py-2 text-sm font-semibold text-white hover:bg-[#14472B]"
+              className="mt-4 w-full rounded border border-[#B59124] bg-[#D4AF37] py-2 text-sm font-semibold text-[#0D0F12] hover:bg-[#E5C158]"
             >
               Got it
             </button>

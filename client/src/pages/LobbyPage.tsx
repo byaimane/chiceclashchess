@@ -215,40 +215,40 @@ export function LobbyPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       {/* Player Header & Progression */}
-      <div className="rounded border border-[#DDD6C8] bg-white p-5 sm:p-6">
+      <div className="rounded border border-[#2A313F] bg-[#151921] p-5 sm:p-6">
         <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1 rounded border border-[#1B5E3A]/30 bg-[#1B5E3A]/10 px-2 py-0.5 text-xs font-semibold text-[#1B5E3A]">
+              <span className="inline-flex items-center gap-1 rounded border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-2 py-0.5 text-xs font-semibold text-[#D4AF37]">
                 <Award className="h-3.5 w-3.5" />
                 Level {levelInfo.level} &middot; {levelInfo.rankTitle}
               </span>
-              <span className="text-xs font-medium text-[#57534E]">
+              <span className="text-xs font-medium text-[#9CA3AF]">
                 {user.xp ?? 0} XP
               </span>
             </div>
-            <h1 className="mt-1.5 text-2xl font-bold text-[#1C1917] sm:text-3xl">
+            <h1 className="mt-1.5 text-2xl font-bold text-[#F5F0E6] sm:text-3xl">
               {user.username}
             </h1>
-            <p className="mt-0.5 text-sm text-[#57534E]">{user.email}</p>
+            <p className="mt-0.5 text-sm text-[#9CA3AF]">{user.email}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
-            <div className="rounded border border-[#DDD6C8] bg-[#FAF8F4] px-3.5 py-2 text-center">
-              <div className="text-base font-bold text-[#1B5E3A]">{user.wins}</div>
-              <div className="text-[10px] uppercase tracking-wider text-[#57534E]">Wins</div>
+            <div className="rounded border border-[#2A313F] bg-[#0D0F12] px-3.5 py-2 text-center">
+              <div className="text-base font-bold text-[#D4AF37]">{user.wins}</div>
+              <div className="text-[10px] uppercase tracking-wider text-[#9CA3AF]">Wins</div>
             </div>
-            <div className="rounded border border-[#DDD6C8] bg-[#FAF8F4] px-3.5 py-2 text-center">
+            <div className="rounded border border-[#2A313F] bg-[#0D0F12] px-3.5 py-2 text-center">
               <div className="text-base font-bold text-red-700">{user.losses}</div>
-              <div className="text-[10px] uppercase tracking-wider text-[#57534E]">Losses</div>
+              <div className="text-[10px] uppercase tracking-wider text-[#9CA3AF]">Losses</div>
             </div>
-            <div className="rounded border border-[#DDD6C8] bg-[#FAF8F4] px-3.5 py-2 text-center">
+            <div className="rounded border border-[#2A313F] bg-[#0D0F12] px-3.5 py-2 text-center">
               <div className="text-base font-bold text-[#7C4A2D]">{user.draws}</div>
-              <div className="text-[10px] uppercase tracking-wider text-[#57534E]">Draws</div>
+              <div className="text-[10px] uppercase tracking-wider text-[#9CA3AF]">Draws</div>
             </div>
-            <div className="rounded border border-[#1B5E3A]/30 bg-[#1B5E3A]/10 px-3.5 py-2 text-center">
-              <div className="text-base font-bold text-[#1B5E3A]">{user.points ?? 0}</div>
-              <div className="text-[10px] uppercase tracking-wider text-[#1B5E3A]">Points</div>
+            <div className="rounded border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-3.5 py-2 text-center">
+              <div className="text-base font-bold text-[#D4AF37]">{user.points ?? 0}</div>
+              <div className="text-[10px] uppercase tracking-wider text-[#D4AF37]">Points</div>
             </div>
             <div className="rounded border border-[#7C4A2D]/30 bg-[#7C4A2D]/10 px-3.5 py-2 text-center">
               <div className="text-base font-bold text-[#7C4A2D]">
@@ -261,7 +261,7 @@ export function LobbyPage() {
                 logout();
                 navigate('/');
               }}
-              className="inline-flex items-center gap-1.5 rounded border border-[#D6CEC0] bg-white px-3.5 py-2.5 text-sm font-medium text-[#1C1917] transition hover:bg-[#F6F3EC]"
+              className="inline-flex items-center gap-1.5 rounded border border-[#2A313F] bg-[#151921] px-3.5 py-2.5 text-sm font-medium text-[#F5F0E6] transition hover:bg-[#1B202A]"
             >
               <LogOut className="h-4 w-4" />
               Logout
@@ -271,17 +271,17 @@ export function LobbyPage() {
 
         {/* XP Progress Bar */}
         <div className="mt-5 border-t border-[#EDE7DC] pt-4">
-          <div className="flex items-center justify-between text-xs text-[#57534E]">
+          <div className="flex items-center justify-between text-xs text-[#9CA3AF]">
             <span>
               Next Level ({levelInfo.level + 1}): {user.xp ?? 0} / {levelInfo.nextThreshold} XP
             </span>
-            <span className="font-medium text-[#1C1917]">
+            <span className="font-medium text-[#F5F0E6]">
               Win: +100 pts &middot; Draw: +40 pts &middot; Loss: +15 pts
             </span>
           </div>
-          <div className="mt-1.5 h-2 w-full overflow-hidden rounded border border-[#DDD6C8] bg-[#F6F3EC]">
+          <div className="mt-1.5 h-2 w-full overflow-hidden rounded border border-[#2A313F] bg-[#1B202A]">
             <div
-              className="h-full bg-[#1B5E3A] transition-all duration-300"
+              className="h-full bg-[#D4AF37] transition-all duration-300"
               style={{ width: `${levelInfo.progressPct}%` }}
             />
           </div>
@@ -290,22 +290,22 @@ export function LobbyPage() {
 
       {/* Plugin Announcement Banner */}
       {bannerPlugin && bannerConfig.message && (
-        <div className="mt-4 rounded border border-[#1B5E3A]/30 bg-[#1B5E3A]/10 px-4 py-2.5 text-sm font-medium text-[#1B5E3A]">
+        <div className="mt-4 rounded border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-4 py-2.5 text-sm font-medium text-[#D4AF37]">
           {bannerConfig.message}
         </div>
       )}
 
       {/* User Panel: Playing Arena Theme Selector */}
-      <div className="mt-6 rounded border border-[#DDD6C8] bg-white p-5">
+      <div className="mt-6 rounded border border-[#2A313F] bg-[#151921] p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <Palette className="h-4 w-4 text-[#1B5E3A]" />
-            <h2 className="font-editorial text-lg font-bold text-[#1C1917]">
+            <Palette className="h-4 w-4 text-[#D4AF37]" />
+            <h2 className="font-editorial text-lg font-bold text-[#F5F0E6]">
               Playing Arena Theme &amp; View
             </h2>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <div className="inline-flex overflow-hidden rounded border border-[#D6CEC0] bg-[#FAF8F4]">
+            <div className="inline-flex overflow-hidden rounded border border-[#2A313F] bg-[#0D0F12]">
               <button
                 type="button"
                 onClick={() => {
@@ -314,8 +314,8 @@ export function LobbyPage() {
                 }}
                 className={`px-3 py-1 text-xs font-semibold transition ${
                   viewMode === '2d'
-                    ? 'bg-[#1B5E3A] text-white'
-                    : 'text-[#1C1917] hover:bg-white'
+                    ? 'bg-[#D4AF37] text-[#0D0F12]'
+                    : 'text-[#F5F0E6] hover:bg-[#151921]'
                 }`}
               >
                 2D Board
@@ -328,14 +328,14 @@ export function LobbyPage() {
                 }}
                 className={`px-3 py-1 text-xs font-semibold transition ${
                   viewMode === '3d'
-                    ? 'bg-[#1B5E3A] text-white'
-                    : 'text-[#1C1917] hover:bg-white'
+                    ? 'bg-[#D4AF37] text-[#0D0F12]'
+                    : 'text-[#F5F0E6] hover:bg-[#151921]'
                 }`}
               >
                 3D Arena
               </button>
             </div>
-            <span className="text-xs text-[#57534E]">
+            <span className="text-xs text-[#9CA3AF]">
               {savingTheme ? 'Saving preference...' : 'Choose your board style'}
             </span>
           </div>
@@ -351,8 +351,8 @@ export function LobbyPage() {
                 onClick={() => handleSelectTheme(t.slug)}
                 className={`flex items-center justify-between gap-3 rounded border p-3 text-left transition ${
                   active
-                    ? 'border-[#1B5E3A] bg-[#1B5E3A]/5 ring-1 ring-[#1B5E3A]'
-                    : 'border-[#DDD6C8] bg-[#FAF8F4] hover:border-[#1B5E3A]/50'
+                    ? 'border-[#D4AF37] bg-[#D4AF37]/5 ring-1 ring-[#1B5E3A]'
+                    : 'border-[#2A313F] bg-[#0D0F12] hover:border-[#D4AF37]/50'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -366,13 +366,13 @@ export function LobbyPage() {
                     <div style={{ backgroundColor: t.lightSquare }} />
                   </div>
                   <div>
-                    <div className="text-sm font-semibold text-[#1C1917]">{t.name}</div>
-                    <div className="text-[11px] text-[#57534E] line-clamp-1">
+                    <div className="text-sm font-semibold text-[#F5F0E6]">{t.name}</div>
+                    <div className="text-[11px] text-[#9CA3AF] line-clamp-1">
                       {t.description || 'Custom 2D arena theme'}
                     </div>
                   </div>
                 </div>
-                {active && <Check className="h-4 w-4 shrink-0 text-[#1B5E3A]" />}
+                {active && <Check className="h-4 w-4 shrink-0 text-[#D4AF37]" />}
               </button>
             );
           })}
@@ -380,26 +380,26 @@ export function LobbyPage() {
       </div>
 
       {error && (
-        <div className="mt-6 rounded border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <div className="mt-6 rounded border border-red-500/40 bg-red-950/50 px-4 py-3 text-sm text-red-200">
           {error}
         </div>
       )}
 
       {redeemSuccess && (
-        <div className="mt-6 rounded border border-[#1B5E3A]/40 bg-[#1B5E3A]/10 px-4 py-3 text-sm text-[#1B5E3A]">
+        <div className="mt-6 rounded border border-[#D4AF37]/40 bg-[#D4AF37]/10 px-4 py-3 text-sm text-[#D4AF37]">
           {redeemSuccess}
         </div>
       )}
 
       {/* Play Actions */}
       <div className="mt-8 grid gap-6 md:grid-cols-3">
-        <div className="flex flex-col justify-between rounded border border-[#1B5E3A]/40 bg-white p-6">
+        <div className="flex flex-col justify-between rounded border border-[#D4AF37]/40 bg-[#151921] p-6">
           <div>
-            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded border border-[#1B5E3A]/30 bg-[#1B5E3A]/10 text-[#1B5E3A]">
+            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded border border-[#D4AF37]/30 bg-[#D4AF37]/10 text-[#D4AF37]">
               <Swords className="h-5 w-5" />
             </div>
-            <h2 className="text-lg font-bold text-[#1C1917]">Auto Quick Match</h2>
-            <p className="mt-2 text-sm text-[#57534E]">
+            <h2 className="text-lg font-bold text-[#F5F0E6]">Auto Quick Match</h2>
+            <p className="mt-2 text-sm text-[#9CA3AF]">
               Automatically searches for an opponent and pairs you the moment
               another player is ready.
             </p>
@@ -409,7 +409,7 @@ export function LobbyPage() {
             className={`mt-6 inline-flex w-full items-center justify-center gap-2 rounded border px-4 py-2.5 text-sm font-semibold transition ${
               searching
                 ? 'border-amber-600/40 bg-amber-50 text-amber-900 hover:bg-amber-100'
-                : 'border-[#14472B] bg-[#1B5E3A] text-white hover:bg-[#14472B]'
+                : 'border-[#B59124] bg-[#D4AF37] text-[#0D0F12] hover:bg-[#E5C158]'
             }`}
           >
             {searching ? (
@@ -424,32 +424,32 @@ export function LobbyPage() {
           </button>
         </div>
 
-        <div className="flex flex-col justify-between rounded border border-[#DDD6C8] bg-white p-6">
+        <div className="flex flex-col justify-between rounded border border-[#2A313F] bg-[#151921] p-6">
           <div>
-            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded border border-[#DDD6C8] bg-[#F6F3EC] text-[#1C1917]">
+            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded border border-[#2A313F] bg-[#1B202A] text-[#F5F0E6]">
               <Plus className="h-5 w-5" />
             </div>
-            <h2 className="text-lg font-bold text-[#1C1917]">Create Game</h2>
-            <p className="mt-2 text-sm text-[#57534E]">
+            <h2 className="text-lg font-bold text-[#F5F0E6]">Create Game</h2>
+            <p className="mt-2 text-sm text-[#9CA3AF]">
               Generate a unique room code and share the invite link with a friend.
             </p>
           </div>
           <button
             onClick={handleCreateGame}
             disabled={creating}
-            className="mt-6 w-full rounded border border-[#1C1917] bg-[#1C1917] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#332E2A] disabled:opacity-50"
+            className="mt-6 w-full rounded border border-[#D4AF37]/60 bg-[#1C1917] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#332E2A] disabled:opacity-50"
           >
             {creating ? 'Creating Room...' : 'Create Private Room'}
           </button>
         </div>
 
-        <div className="flex flex-col justify-between rounded border border-[#DDD6C8] bg-white p-6">
+        <div className="flex flex-col justify-between rounded border border-[#2A313F] bg-[#151921] p-6">
           <div>
-            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded border border-[#DDD6C8] bg-[#F6F3EC] text-[#1C1917]">
+            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded border border-[#2A313F] bg-[#1B202A] text-[#F5F0E6]">
               <KeyRound className="h-5 w-5" />
             </div>
-            <h2 className="text-lg font-bold text-[#1C1917]">Join Game</h2>
-            <p className="mt-2 text-sm text-[#57534E]">
+            <h2 className="text-lg font-bold text-[#F5F0E6]">Join Game</h2>
+            <p className="mt-2 text-sm text-[#9CA3AF]">
               Enter a room code to sit down at an existing table.
             </p>
           </div>
@@ -460,11 +460,11 @@ export function LobbyPage() {
               onChange={(e) => setRoomInput(e.target.value.toUpperCase())}
               placeholder="ROOM CODE"
               maxLength={8}
-              className="min-w-0 flex-1 rounded border border-[#D6CEC0] bg-[#FAF8F4] px-3.5 py-2 font-mono text-sm uppercase tracking-widest text-[#1C1917] placeholder:text-[#78716C] focus:border-[#1B5E3A] focus:outline-none"
+              className="min-w-0 flex-1 rounded border border-[#2A313F] bg-[#0D0F12] px-3.5 py-2 font-mono text-sm uppercase tracking-widest text-[#F5F0E6] placeholder:text-[#6B7280] focus:border-[#D4AF37] focus:outline-none"
             />
             <button
               type="submit"
-              className="rounded border border-[#D6CEC0] bg-[#F6F3EC] px-4 py-2 text-sm font-semibold text-[#1C1917] transition hover:bg-[#EAE3D5]"
+              className="rounded border border-[#2A313F] bg-[#1B202A] px-4 py-2 text-sm font-semibold text-[#F5F0E6] transition hover:bg-[#232A36]"
             >
               Join
             </button>
@@ -473,21 +473,21 @@ export function LobbyPage() {
       </div>
 
       {/* Earn Money from Points */}
-      <div className="mt-8 rounded border border-[#DDD6C8] bg-white p-6">
+      <div className="mt-8 rounded border border-[#2A313F] bg-[#151921] p-6">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#EDE7DC] pb-4">
           <div className="flex items-center gap-2">
-            <DollarSign className="h-5 w-5 text-[#1B5E3A]" />
+            <DollarSign className="h-5 w-5 text-[#D4AF37]" />
             <div>
-              <h2 className="text-lg font-bold text-[#1C1917]">
+              <h2 className="text-lg font-bold text-[#F5F0E6]">
                 Earn Money from Points
               </h2>
-              <p className="text-xs text-[#57534E]">
+              <p className="text-xs text-[#9CA3AF]">
                 Rate: 100 Points = $0.10 &middot; Minimum cash-out: 500 Points ($0.50)
               </p>
             </div>
           </div>
-          <div className="text-sm font-semibold text-[#1C1917]">
-            Available: <span className="text-[#1B5E3A]">{user.points ?? 0} pts</span> (
+          <div className="text-sm font-semibold text-[#F5F0E6]">
+            Available: <span className="text-[#D4AF37]">{user.points ?? 0} pts</span> (
             {formatUsd(Math.floor((user.points ?? 0) / 10))})
           </div>
         </div>
@@ -496,7 +496,7 @@ export function LobbyPage() {
           <form onSubmit={handleRedeem} className="space-y-3">
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#57534E]">
+                <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
                   Points to Convert
                 </label>
                 <input
@@ -505,17 +505,17 @@ export function LobbyPage() {
                   step={100}
                   value={redeemPoints}
                   onChange={(e) => setRedeemPoints(Number(e.target.value))}
-                  className="w-full rounded border border-[#D6CEC0] bg-[#FAF8F4] px-3 py-2 text-sm text-[#1C1917] focus:border-[#1B5E3A] focus:outline-none"
+                  className="w-full rounded border border-[#2A313F] bg-[#0D0F12] px-3 py-2 text-sm text-[#F5F0E6] focus:border-[#D4AF37] focus:outline-none"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#57534E]">
+                <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
                   Payout Method
                 </label>
                 <select
                   value={payoutMethod}
                   onChange={(e) => setPayoutMethod(e.target.value)}
-                  className="w-full rounded border border-[#D6CEC0] bg-[#FAF8F4] px-3 py-2 text-sm text-[#1C1917] focus:border-[#1B5E3A] focus:outline-none"
+                  className="w-full rounded border border-[#2A313F] bg-[#0D0F12] px-3 py-2 text-sm text-[#F5F0E6] focus:border-[#D4AF37] focus:outline-none"
                 >
                   <option value="PayPal">PayPal</option>
                   <option value="Bank Transfer">Bank Transfer</option>
@@ -525,7 +525,7 @@ export function LobbyPage() {
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#57534E]">
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
                 Payout Email / Account
               </label>
               <input
@@ -534,14 +534,14 @@ export function LobbyPage() {
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
                 placeholder="you@example.com or account ID"
-                className="w-full rounded border border-[#D6CEC0] bg-[#FAF8F4] px-3 py-2 text-sm text-[#1C1917] placeholder:text-[#78716C] focus:border-[#1B5E3A] focus:outline-none"
+                className="w-full rounded border border-[#2A313F] bg-[#0D0F12] px-3 py-2 text-sm text-[#F5F0E6] placeholder:text-[#6B7280] focus:border-[#D4AF37] focus:outline-none"
               />
             </div>
 
             <button
               type="submit"
               disabled={redeeming || (user.points ?? 0) < 500}
-              className="rounded border border-[#14472B] bg-[#1B5E3A] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#14472B] disabled:opacity-50"
+              className="rounded border border-[#B59124] bg-[#D4AF37] px-5 py-2.5 text-sm font-semibold text-[#0D0F12] transition hover:bg-[#E5C158] disabled:opacity-50"
             >
               {redeeming
                 ? 'Submitting...'
@@ -550,34 +550,34 @@ export function LobbyPage() {
           </form>
 
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#57534E]">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
               Your Payout Requests
             </h3>
             {payouts.length === 0 ? (
-              <p className="mt-3 text-sm text-[#57534E]">
+              <p className="mt-3 text-sm text-[#9CA3AF]">
                 No cash-out requests yet. Play matches to earn points!
               </p>
             ) : (
-              <div className="mt-3 divide-y divide-[#EDE7DC] rounded border border-[#DDD6C8] bg-[#FAF8F4]">
+              <div className="mt-3 divide-y divide-[#EDE7DC] rounded border border-[#2A313F] bg-[#0D0F12]">
                 {payouts.slice(0, 5).map((p) => (
                   <div
                     key={p.id}
                     className="flex items-center justify-between gap-3 px-3 py-2.5 text-xs"
                   >
                     <div>
-                      <span className="font-semibold text-[#1C1917]">
+                      <span className="font-semibold text-[#F5F0E6]">
                         {formatUsd(p.amountCents)}
                       </span>{' '}
-                      <span className="text-[#57534E]">
+                      <span className="text-[#9CA3AF]">
                         ({p.pointsSpent} pts &middot; {p.payoutMethod})
                       </span>
                     </div>
                     <span
                       className={`rounded border px-2 py-0.5 font-semibold ${
                         p.status === 'APPROVED'
-                          ? 'border-[#1B5E3A]/30 bg-[#1B5E3A]/10 text-[#1B5E3A]'
+                          ? 'border-[#D4AF37]/30 bg-[#D4AF37]/10 text-[#D4AF37]'
                           : p.status === 'REJECTED'
-                          ? 'border-red-300 bg-red-50 text-red-800'
+                          ? 'border-red-500/40 bg-red-950/50 text-red-200'
                           : 'border-amber-600/30 bg-amber-50 text-amber-900'
                       }`}
                     >
@@ -593,22 +593,22 @@ export function LobbyPage() {
 
       {/* Online Players & Match History */}
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <div className="rounded border border-[#DDD6C8] bg-white p-6">
+        <div className="rounded border border-[#2A313F] bg-[#151921] p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-[#1B5E3A]" />
-              <h2 className="text-lg font-bold text-[#1C1917]">
+              <Users className="h-5 w-5 text-[#D4AF37]" />
+              <h2 className="text-lg font-bold text-[#F5F0E6]">
                 Online Players ({onlineUsers.length})
               </h2>
             </div>
-            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#1B5E3A]">
-              <span className="h-2 w-2 rounded-full bg-[#1B5E3A]" />
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#D4AF37]">
+              <span className="h-2 w-2 rounded-full bg-[#D4AF37]" />
               Live
             </span>
           </div>
 
           {otherOnlineUsers.length === 0 ? (
-            <p className="mt-4 text-sm text-[#57534E]">
+            <p className="mt-4 text-sm text-[#9CA3AF]">
               No other players online right now. Open another browser window or
               invite a friend to play!
             </p>
@@ -626,13 +626,13 @@ export function LobbyPage() {
                           ? 'bg-amber-500'
                           : online.status === 'in_game'
                           ? 'bg-[#7C4A2D]'
-                          : 'bg-[#1B5E3A]'
+                          : 'bg-[#D4AF37]'
                       }`}
                     />
-                    <span className="font-semibold text-[#1C1917]">
+                    <span className="font-semibold text-[#F5F0E6]">
                       {online.username}
                     </span>
-                    <span className="rounded border border-[#DDD6C8] bg-[#F6F3EC] px-2 py-0.5 text-[11px] font-medium text-[#57534E]">
+                    <span className="rounded border border-[#2A313F] bg-[#1B202A] px-2 py-0.5 text-[11px] font-medium text-[#9CA3AF]">
                       {online.status === 'searching'
                         ? 'Searching'
                         : online.status === 'in_game'
@@ -644,7 +644,7 @@ export function LobbyPage() {
                   {online.status !== 'in_game' && (
                     <button
                       onClick={() => handleChallenge(online.userId)}
-                      className="rounded border border-[#14472B] bg-[#1B5E3A] px-3 py-1 text-xs font-semibold text-white transition hover:bg-[#14472B]"
+                      className="rounded border border-[#B59124] bg-[#D4AF37] px-3 py-1 text-xs font-semibold text-[#0D0F12] transition hover:bg-[#E5C158]"
                     >
                       Challenge
                     </button>
@@ -655,13 +655,13 @@ export function LobbyPage() {
           )}
         </div>
 
-        <div className="rounded border border-[#DDD6C8] bg-white p-6">
+        <div className="rounded border border-[#2A313F] bg-[#151921] p-6">
           <div className="flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-[#1B5E3A]" />
-            <h2 className="text-lg font-bold text-[#1C1917]">Recent Matches</h2>
+            <Trophy className="h-5 w-5 text-[#D4AF37]" />
+            <h2 className="text-lg font-bold text-[#F5F0E6]">Recent Matches</h2>
           </div>
           {history.length === 0 ? (
-            <p className="mt-4 text-sm text-[#57534E]">
+            <p className="mt-4 text-sm text-[#9CA3AF]">
               No completed matches recorded yet. Play a game to see your history here.
             </p>
           ) : (
@@ -679,10 +679,10 @@ export function LobbyPage() {
                   (!isWhite && item.result === 'BLACK_WIN')
                 ) {
                   badge = 'Win';
-                  badgeClass = 'border-[#1B5E3A]/30 bg-[#1B5E3A]/10 text-[#1B5E3A]';
+                  badgeClass = 'border-[#D4AF37]/30 bg-[#D4AF37]/10 text-[#D4AF37]';
                 } else if (item.result !== 'DRAW') {
                   badge = 'Loss';
-                  badgeClass = 'border-red-300 bg-red-50 text-red-800';
+                  badgeClass = 'border-red-500/40 bg-red-950/50 text-red-200';
                 }
 
                 return (
@@ -691,8 +691,8 @@ export function LobbyPage() {
                     className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm"
                   >
                     <div>
-                      <span className="font-semibold text-[#1C1917]">vs {opponent}</span>
-                      <span className="ml-2 text-xs text-[#57534E]">
+                      <span className="font-semibold text-[#F5F0E6]">vs {opponent}</span>
+                      <span className="ml-2 text-xs text-[#9CA3AF]">
                         ({isWhite ? 'White' : 'Black'} &middot; {item.endReason ?? 'completed'})
                       </span>
                     </div>

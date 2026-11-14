@@ -1,14 +1,14 @@
 {
   "id": "/",
-  "name": "ChoiceCLASH — 2D Online Chess",
+  "name": "ChoiceCLASH — Grandmaster Chess",
   "short_name": "ChoiceCLASH",
-  "description": "2D Online Multiplayer Chess",
+  "description": "Online 2D & 3D Multiplayer Chess",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#F6F3EC",
-  "theme_color": "#1B5E3A",
+  "background_color": "#0D0F12",
+  "theme_color": "#D4AF37",
   "icons": [
     {
       "src": "/icon-192.png",

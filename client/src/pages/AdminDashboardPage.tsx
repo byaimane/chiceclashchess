@@ -224,13 +224,13 @@ export function AdminDashboardPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#DDD6C8] pb-6">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#2A313F] pb-6">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-[#7C4A2D]">
             ChoiceCLASH Administration
           </p>
-          <h1 className="mt-1 text-3xl font-bold text-[#1C1917]">Admin Dashboard</h1>
-          <p className="mt-1 text-sm text-[#57534E]">
+          <h1 className="mt-1 text-3xl font-bold text-[#F5F0E6]">Admin Dashboard</h1>
+          <p className="mt-1 text-sm text-[#9CA3AF]">
             Signed in as {currentUser?.email}
           </p>
         </div>
@@ -238,7 +238,7 @@ export function AdminDashboardPage() {
         <button
           onClick={loadAll}
           disabled={loading}
-          className="inline-flex items-center gap-2 rounded border border-[#D6CEC0] bg-white px-4 py-2 text-sm font-medium text-[#1C1917] transition hover:bg-[#EFEAE0]"
+          className="inline-flex items-center gap-2 rounded border border-[#2A313F] bg-[#151921] px-4 py-2 text-sm font-medium text-[#F5F0E6] transition hover:bg-[#232A36]"
         >
           <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh
@@ -246,7 +246,7 @@ export function AdminDashboardPage() {
       </div>
 
       {error && (
-        <div className="mt-6 rounded border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <div className="mt-6 rounded border border-red-500/40 bg-red-950/50 px-4 py-3 text-sm text-red-200">
           {error}
         </div>
       )}
@@ -254,41 +254,41 @@ export function AdminDashboardPage() {
       {/* Overview Stats */}
       {overview && (
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-          <div className="rounded border border-[#DDD6C8] bg-white p-4">
-            <div className="text-xs uppercase tracking-wider text-[#57534E]">Users</div>
-            <div className="mt-1 text-2xl font-bold text-[#1C1917]">{overview.totalUsers}</div>
+          <div className="rounded border border-[#2A313F] bg-[#151921] p-4">
+            <div className="text-xs uppercase tracking-wider text-[#9CA3AF]">Users</div>
+            <div className="mt-1 text-2xl font-bold text-[#F5F0E6]">{overview.totalUsers}</div>
           </div>
-          <div className="rounded border border-[#DDD6C8] bg-white p-4">
-            <div className="text-xs uppercase tracking-wider text-[#57534E]">Banned</div>
+          <div className="rounded border border-[#2A313F] bg-[#151921] p-4">
+            <div className="text-xs uppercase tracking-wider text-[#9CA3AF]">Banned</div>
             <div className="mt-1 text-2xl font-bold text-red-700">{overview.bannedUsers}</div>
           </div>
-          <div className="rounded border border-[#DDD6C8] bg-white p-4">
-            <div className="text-xs uppercase tracking-wider text-[#57534E]">Live Rooms</div>
-            <div className="mt-1 text-2xl font-bold text-[#1B5E3A]">{overview.activeRooms}</div>
+          <div className="rounded border border-[#2A313F] bg-[#151921] p-4">
+            <div className="text-xs uppercase tracking-wider text-[#9CA3AF]">Live Rooms</div>
+            <div className="mt-1 text-2xl font-bold text-[#D4AF37]">{overview.activeRooms}</div>
           </div>
-          <div className="rounded border border-[#DDD6C8] bg-white p-4">
-            <div className="text-xs uppercase tracking-wider text-[#57534E]">Games</div>
-            <div className="mt-1 text-2xl font-bold text-[#1C1917]">{overview.totalGames}</div>
+          <div className="rounded border border-[#2A313F] bg-[#151921] p-4">
+            <div className="text-xs uppercase tracking-wider text-[#9CA3AF]">Games</div>
+            <div className="mt-1 text-2xl font-bold text-[#F5F0E6]">{overview.totalGames}</div>
           </div>
-          <div className="rounded border border-[#DDD6C8] bg-white p-4">
-            <div className="text-xs uppercase tracking-wider text-[#57534E]">Completed</div>
+          <div className="rounded border border-[#2A313F] bg-[#151921] p-4">
+            <div className="text-xs uppercase tracking-wider text-[#9CA3AF]">Completed</div>
             <div className="mt-1 text-2xl font-bold text-[#7C4A2D]">{overview.completedGames}</div>
           </div>
-          <div className="rounded border border-[#DDD6C8] bg-white p-4">
-            <div className="text-xs uppercase tracking-wider text-[#57534E]">Pending Payouts</div>
+          <div className="rounded border border-[#2A313F] bg-[#151921] p-4">
+            <div className="text-xs uppercase tracking-wider text-[#9CA3AF]">Pending Payouts</div>
             <div className="mt-1 text-2xl font-bold text-amber-800">{overview.pendingPayouts}</div>
           </div>
         </div>
       )}
 
       {/* Tabs */}
-      <div className="mt-8 flex flex-wrap gap-2 border-b border-[#DDD6C8]">
+      <div className="mt-8 flex flex-wrap gap-2 border-b border-[#2A313F]">
         <button
           onClick={() => setTab('users')}
           className={`inline-flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition ${
             tab === 'users'
-              ? 'border-[#1B5E3A] text-[#1B5E3A]'
-              : 'border-transparent text-[#57534E] hover:text-[#1C1917]'
+              ? 'border-[#D4AF37] text-[#D4AF37]'
+              : 'border-transparent text-[#9CA3AF] hover:text-[#F5F0E6]'
           }`}
         >
           <Users className="h-4 w-4" />
@@ -298,8 +298,8 @@ export function AdminDashboardPage() {
           onClick={() => setTab('games')}
           className={`inline-flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition ${
             tab === 'games'
-              ? 'border-[#1B5E3A] text-[#1B5E3A]'
-              : 'border-transparent text-[#57534E] hover:text-[#1C1917]'
+              ? 'border-[#D4AF37] text-[#D4AF37]'
+              : 'border-transparent text-[#9CA3AF] hover:text-[#F5F0E6]'
           }`}
         >
           <Shield className="h-4 w-4" />
@@ -309,8 +309,8 @@ export function AdminDashboardPage() {
           onClick={() => setTab('payouts')}
           className={`inline-flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition ${
             tab === 'payouts'
-              ? 'border-[#1B5E3A] text-[#1B5E3A]'
-              : 'border-transparent text-[#57534E] hover:text-[#1C1917]'
+              ? 'border-[#D4AF37] text-[#D4AF37]'
+              : 'border-transparent text-[#9CA3AF] hover:text-[#F5F0E6]'
           }`}
         >
           <DollarSign className="h-4 w-4" />
@@ -320,8 +320,8 @@ export function AdminDashboardPage() {
           onClick={() => setTab('themes')}
           className={`inline-flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition ${
             tab === 'themes'
-              ? 'border-[#1B5E3A] text-[#1B5E3A]'
-              : 'border-transparent text-[#57534E] hover:text-[#1C1917]'
+              ? 'border-[#D4AF37] text-[#D4AF37]'
+              : 'border-transparent text-[#9CA3AF] hover:text-[#F5F0E6]'
           }`}
         >
           <Palette className="h-4 w-4" />
@@ -331,8 +331,8 @@ export function AdminDashboardPage() {
           onClick={() => setTab('plugins')}
           className={`inline-flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition ${
             tab === 'plugins'
-              ? 'border-[#1B5E3A] text-[#1B5E3A]'
-              : 'border-transparent text-[#57534E] hover:text-[#1C1917]'
+              ? 'border-[#D4AF37] text-[#D4AF37]'
+              : 'border-transparent text-[#9CA3AF] hover:text-[#F5F0E6]'
           }`}
         >
           <Plug className="h-4 w-4" />
@@ -348,13 +348,13 @@ export function AdminDashboardPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by username or email..."
-              className="w-full max-w-sm rounded border border-[#D6CEC0] bg-white px-3.5 py-2 text-sm text-[#1C1917] placeholder:text-[#78716C] focus:border-[#1B5E3A] focus:outline-none"
+              className="w-full max-w-sm rounded border border-[#2A313F] bg-[#151921] px-3.5 py-2 text-sm text-[#F5F0E6] placeholder:text-[#6B7280] focus:border-[#D4AF37] focus:outline-none"
             />
           </div>
 
-          <div className="overflow-x-auto rounded border border-[#DDD6C8] bg-white">
+          <div className="overflow-x-auto rounded border border-[#2A313F] bg-[#151921]">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-[#DDD6C8] bg-[#F6F3EC] text-xs uppercase tracking-wider text-[#57534E]">
+              <thead className="border-b border-[#2A313F] bg-[#1B202A] text-xs uppercase tracking-wider text-[#9CA3AF]">
                 <tr>
                   <th className="px-4 py-3">Player</th>
                   <th className="px-4 py-3">Role</th>
@@ -369,10 +369,10 @@ export function AdminDashboardPage() {
                   const isEditing = editingId === u.id;
                   const isPrimaryAdmin = u.email === 'admin@choiceclash.com';
                   return (
-                    <tr key={u.id} className="hover:bg-[#FAF8F4]">
+                    <tr key={u.id} className="hover:bg-[#0D0F12]">
                       <td className="px-4 py-3">
-                        <div className="font-semibold text-[#1C1917]">{u.username}</div>
-                        <div className="text-xs text-[#57534E]">{u.email}</div>
+                        <div className="font-semibold text-[#F5F0E6]">{u.username}</div>
+                        <div className="text-xs text-[#9CA3AF]">{u.email}</div>
                       </td>
                       <td className="px-4 py-3">
                         <button
@@ -382,7 +382,7 @@ export function AdminDashboardPage() {
                           className={`rounded border px-2 py-0.5 text-xs font-semibold ${
                             u.role === 'ADMIN'
                               ? 'border-[#7C4A2D]/40 bg-[#7C4A2D]/10 text-[#7C4A2D]'
-                              : 'border-[#DDD6C8] bg-[#F6F3EC] text-[#57534E]'
+                              : 'border-[#2A313F] bg-[#1B202A] text-[#9CA3AF]'
                           } disabled:cursor-not-allowed`}
                         >
                           {u.role}
@@ -390,22 +390,22 @@ export function AdminDashboardPage() {
                       </td>
                       <td className="px-4 py-3">
                         {u.isBanned ? (
-                          <span className="inline-flex items-center gap-1 rounded border border-red-300 bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-800">
+                          <span className="inline-flex items-center gap-1 rounded border border-red-500/40 bg-red-950/50 px-2 py-0.5 text-xs font-semibold text-red-200">
                             <Ban className="h-3 w-3" />
                             Banned
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 rounded border border-[#1B5E3A]/30 bg-[#1B5E3A]/10 px-2 py-0.5 text-xs font-semibold text-[#1B5E3A]">
+                          <span className="inline-flex items-center gap-1 rounded border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-2 py-0.5 text-xs font-semibold text-[#D4AF37]">
                             <CheckCircle2 className="h-3 w-3" />
                             Active
                           </span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-xs">
-                        <div className="font-semibold text-[#1C1917]">
+                        <div className="font-semibold text-[#F5F0E6]">
                           Lv.{u.level ?? 1} &middot; {u.points ?? 0} pts
                         </div>
-                        <div className="text-[#57534E]">
+                        <div className="text-[#9CA3AF]">
                           Earned {formatUsd(u.walletCents ?? 0)}
                         </div>
                       </td>
@@ -420,7 +420,7 @@ export function AdminDashboardPage() {
                                 setEditStats((s) => ({ ...s, wins: Number(e.target.value) }))
                               }
                               title="Wins"
-                              className="w-12 rounded border border-[#D6CEC0] px-1.5 py-1"
+                              className="w-12 rounded border border-[#2A313F] px-1.5 py-1"
                             />
                             <input
                               type="number"
@@ -430,7 +430,7 @@ export function AdminDashboardPage() {
                                 setEditStats((s) => ({ ...s, losses: Number(e.target.value) }))
                               }
                               title="Losses"
-                              className="w-12 rounded border border-[#D6CEC0] px-1.5 py-1"
+                              className="w-12 rounded border border-[#2A313F] px-1.5 py-1"
                             />
                             <input
                               type="number"
@@ -440,7 +440,7 @@ export function AdminDashboardPage() {
                                 setEditStats((s) => ({ ...s, draws: Number(e.target.value) }))
                               }
                               title="Draws"
-                              className="w-12 rounded border border-[#D6CEC0] px-1.5 py-1"
+                              className="w-12 rounded border border-[#2A313F] px-1.5 py-1"
                             />
                             <input
                               type="number"
@@ -450,7 +450,7 @@ export function AdminDashboardPage() {
                                 setEditStats((s) => ({ ...s, points: Number(e.target.value) }))
                               }
                               title="Points"
-                              className="w-16 rounded border border-[#D6CEC0] px-1.5 py-1"
+                              className="w-16 rounded border border-[#2A313F] px-1.5 py-1"
                             />
                             <input
                               type="number"
@@ -460,17 +460,17 @@ export function AdminDashboardPage() {
                                 setEditStats((s) => ({ ...s, xp: Number(e.target.value) }))
                               }
                               title="XP"
-                              className="w-16 rounded border border-[#D6CEC0] px-1.5 py-1"
+                              className="w-16 rounded border border-[#2A313F] px-1.5 py-1"
                             />
                             <button
                               onClick={() => handleSaveStats(u.id)}
-                              className="rounded bg-[#1B5E3A] px-2 py-1 text-white"
+                              className="rounded bg-[#D4AF37] px-2 py-1 text-[#0D0F12]"
                             >
                               Save
                             </button>
                             <button
                               onClick={() => setEditingId(null)}
-                              className="rounded border border-[#D6CEC0] px-2 py-1"
+                              className="rounded border border-[#2A313F] px-2 py-1"
                             >
                               Cancel
                             </button>
@@ -487,7 +487,7 @@ export function AdminDashboardPage() {
                                 xp: u.xp ?? 0,
                               });
                             }}
-                            className="rounded border border-transparent px-1.5 py-0.5 hover:border-[#DDD6C8] hover:bg-[#F6F3EC]"
+                            className="rounded border border-transparent px-1.5 py-0.5 hover:border-[#2A313F] hover:bg-[#1B202A]"
                             title="Click to edit stats & points"
                           >
                             {u.wins} / {u.losses} / {u.draws}
@@ -499,14 +499,14 @@ export function AdminDashboardPage() {
                           <button
                             onClick={() => handleToggleBan(u)}
                             disabled={isPrimaryAdmin}
-                            className="rounded border border-[#D6CEC0] bg-white px-2.5 py-1 text-xs font-medium text-[#1C1917] hover:bg-[#F6F3EC] disabled:opacity-40"
+                            className="rounded border border-[#2A313F] bg-[#151921] px-2.5 py-1 text-xs font-medium text-[#F5F0E6] hover:bg-[#1B202A] disabled:opacity-40"
                           >
                             {u.isBanned ? 'Unban' : 'Ban'}
                           </button>
                           <button
                             onClick={() => handleDeleteUser(u)}
                             disabled={isPrimaryAdmin}
-                            className="inline-flex items-center gap-1 rounded border border-red-300 bg-red-50 px-2.5 py-1 text-xs font-medium text-red-800 hover:bg-red-100 disabled:opacity-40"
+                            className="inline-flex items-center gap-1 rounded border border-red-500/40 bg-red-950/50 px-2.5 py-1 text-xs font-medium text-red-200 hover:bg-red-100 disabled:opacity-40"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                             Delete
@@ -525,12 +525,12 @@ export function AdminDashboardPage() {
       {tab === 'games' && (
         <div className="mt-6 space-y-8">
           <div>
-            <h2 className="mb-3 text-lg font-bold text-[#1C1917]">
+            <h2 className="mb-3 text-lg font-bold text-[#F5F0E6]">
               Live Rooms ({rooms.length})
             </h2>
-            <div className="overflow-x-auto rounded border border-[#DDD6C8] bg-white">
+            <div className="overflow-x-auto rounded border border-[#2A313F] bg-[#151921]">
               <table className="w-full text-left text-sm">
-                <thead className="border-b border-[#DDD6C8] bg-[#F6F3EC] text-xs uppercase tracking-wider text-[#57534E]">
+                <thead className="border-b border-[#2A313F] bg-[#1B202A] text-xs uppercase tracking-wider text-[#9CA3AF]">
                   <tr>
                     <th className="px-4 py-3">Room Code</th>
                     <th className="px-4 py-3">Matchup</th>
@@ -542,7 +542,7 @@ export function AdminDashboardPage() {
                 <tbody className="divide-y divide-[#EDE7DC]">
                   {rooms.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-4 py-6 text-center text-xs text-[#78716C]">
+                      <td colSpan={5} className="px-4 py-6 text-center text-xs text-[#6B7280]">
                         No active rooms in memory.
                       </td>
                     </tr>
@@ -558,7 +558,7 @@ export function AdminDashboardPage() {
                         <td className="px-4 py-3 text-right">
                           <button
                             onClick={() => handleCloseRoom(r.roomCode)}
-                            className="rounded border border-red-300 bg-red-50 px-2.5 py-1 text-xs font-medium text-red-800 hover:bg-red-100"
+                            className="rounded border border-red-500/40 bg-red-950/50 px-2.5 py-1 text-xs font-medium text-red-200 hover:bg-red-100"
                           >
                             Close Room
                           </button>
@@ -572,12 +572,12 @@ export function AdminDashboardPage() {
           </div>
 
           <div>
-            <h2 className="mb-3 text-lg font-bold text-[#1C1917]">
+            <h2 className="mb-3 text-lg font-bold text-[#F5F0E6]">
               Recorded Games ({games.length})
             </h2>
-            <div className="overflow-x-auto rounded border border-[#DDD6C8] bg-white">
+            <div className="overflow-x-auto rounded border border-[#2A313F] bg-[#151921]">
               <table className="w-full text-left text-sm">
-                <thead className="border-b border-[#DDD6C8] bg-[#F6F3EC] text-xs uppercase tracking-wider text-[#57534E]">
+                <thead className="border-b border-[#2A313F] bg-[#1B202A] text-xs uppercase tracking-wider text-[#9CA3AF]">
                   <tr>
                     <th className="px-4 py-3">Room</th>
                     <th className="px-4 py-3">Players</th>
@@ -589,7 +589,7 @@ export function AdminDashboardPage() {
                 <tbody className="divide-y divide-[#EDE7DC]">
                   {games.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-4 py-6 text-center text-xs text-[#78716C]">
+                      <td colSpan={5} className="px-4 py-6 text-center text-xs text-[#6B7280]">
                         No games recorded yet.
                       </td>
                     </tr>
@@ -608,7 +608,7 @@ export function AdminDashboardPage() {
                         <td className="px-4 py-3 text-right">
                           <button
                             onClick={() => handleDeleteGame(g.id)}
-                            className="inline-flex items-center gap-1 rounded border border-red-300 bg-red-50 px-2.5 py-1 text-xs font-medium text-red-800 hover:bg-red-100"
+                            className="inline-flex items-center gap-1 rounded border border-red-500/40 bg-red-950/50 px-2.5 py-1 text-xs font-medium text-red-200 hover:bg-red-100"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                             Delete
@@ -625,9 +625,9 @@ export function AdminDashboardPage() {
       )}
 
       {tab === 'payouts' && (
-        <div className="mt-6 overflow-x-auto rounded border border-[#DDD6C8] bg-white">
+        <div className="mt-6 overflow-x-auto rounded border border-[#2A313F] bg-[#151921]">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-[#DDD6C8] bg-[#F6F3EC] text-xs uppercase tracking-wider text-[#57534E]">
+            <thead className="border-b border-[#2A313F] bg-[#1B202A] text-xs uppercase tracking-wider text-[#9CA3AF]">
               <tr>
                 <th className="px-4 py-3">Player</th>
                 <th className="px-4 py-3">Amount</th>
@@ -639,7 +639,7 @@ export function AdminDashboardPage() {
             <tbody className="divide-y divide-[#EDE7DC]">
               {payouts.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-6 text-center text-xs text-[#78716C]">
+                  <td colSpan={5} className="px-4 py-6 text-center text-xs text-[#6B7280]">
                     No payout requests submitted yet.
                   </td>
                 </tr>
@@ -647,20 +647,20 @@ export function AdminDashboardPage() {
                 payouts.map((p) => (
                   <tr key={p.id}>
                     <td className="px-4 py-3">
-                      <div className="font-semibold text-[#1C1917]">
+                      <div className="font-semibold text-[#F5F0E6]">
                         {p.user?.username ?? 'Unknown'}
                       </div>
-                      <div className="text-xs text-[#57534E]">{p.user?.email}</div>
+                      <div className="text-xs text-[#9CA3AF]">{p.user?.email}</div>
                     </td>
                     <td className="px-4 py-3">
-                      <div className="font-semibold text-[#1B5E3A]">
+                      <div className="font-semibold text-[#D4AF37]">
                         {formatUsd(p.amountCents)}
                       </div>
-                      <div className="text-xs text-[#57534E]">{p.pointsSpent} pts</div>
+                      <div className="text-xs text-[#9CA3AF]">{p.pointsSpent} pts</div>
                     </td>
                     <td className="px-4 py-3 text-xs">
-                      <div className="font-semibold text-[#1C1917]">{p.payoutMethod}</div>
-                      <div className="text-[#57534E]">{p.destination}</div>
+                      <div className="font-semibold text-[#F5F0E6]">{p.payoutMethod}</div>
+                      <div className="text-[#9CA3AF]">{p.destination}</div>
                     </td>
                     <td className="px-4 py-3 text-xs font-semibold">{p.status}</td>
                     <td className="px-4 py-3 text-right">
@@ -668,19 +668,19 @@ export function AdminDashboardPage() {
                         <div className="inline-flex gap-2">
                           <button
                             onClick={() => handleProcessPayout(p.id, 'APPROVED')}
-                            className="rounded border border-[#14472B] bg-[#1B5E3A] px-2.5 py-1 text-xs font-semibold text-white hover:bg-[#14472B]"
+                            className="rounded border border-[#B59124] bg-[#D4AF37] px-2.5 py-1 text-xs font-semibold text-[#0D0F12] hover:bg-[#E5C158]"
                           >
                             Approve
                           </button>
                           <button
                             onClick={() => handleProcessPayout(p.id, 'REJECTED')}
-                            className="rounded border border-red-300 bg-red-50 px-2.5 py-1 text-xs font-medium text-red-800 hover:bg-red-100"
+                            className="rounded border border-red-500/40 bg-red-950/50 px-2.5 py-1 text-xs font-medium text-red-200 hover:bg-red-100"
                           >
                             Reject
                           </button>
                         </div>
                       ) : (
-                        <span className="text-xs text-[#78716C]">Processed</span>
+                        <span className="text-xs text-[#6B7280]">Processed</span>
                       )}
                     </td>
                   </tr>
@@ -717,34 +717,34 @@ export function AdminDashboardPage() {
                 setError(err instanceof Error ? err.message : 'Failed to create theme.');
               }
             }}
-            className="rounded border border-[#DDD6C8] bg-white p-5"
+            className="rounded border border-[#2A313F] bg-[#151921] p-5"
           >
-            <h2 className="font-editorial text-lg font-bold text-[#1C1917]">
+            <h2 className="font-editorial text-lg font-bold text-[#F5F0E6]">
               Add New Arena Theme
             </h2>
-            <p className="mt-0.5 text-xs text-[#57534E]">
+            <p className="mt-0.5 text-xs text-[#9CA3AF]">
               Create custom 2D board and arena color themes that players can select in their User Panel.
             </p>
             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div>
-                <label className="block text-xs font-semibold text-[#57534E]">Theme Name</label>
+                <label className="block text-xs font-semibold text-[#9CA3AF]">Theme Name</label>
                 <input
                   type="text"
                   required
                   value={newTheme.name}
                   onChange={(e) => setNewTheme((p) => ({ ...p, name: e.target.value }))}
                   placeholder="e.g. Emerald Classic"
-                  className="mt-1 w-full rounded border border-[#D6CEC0] px-3 py-2 text-sm text-[#1C1917]"
+                  className="mt-1 w-full rounded border border-[#2A313F] px-3 py-2 text-sm text-[#F5F0E6]"
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-xs font-semibold text-[#57534E]">Description</label>
+                <label className="block text-xs font-semibold text-[#9CA3AF]">Description</label>
                 <input
                   type="text"
                   value={newTheme.description}
                   onChange={(e) => setNewTheme((p) => ({ ...p, description: e.target.value }))}
                   placeholder="Short description for players"
-                  className="mt-1 w-full rounded border border-[#D6CEC0] px-3 py-2 text-sm text-[#1C1917]"
+                  className="mt-1 w-full rounded border border-[#2A313F] px-3 py-2 text-sm text-[#F5F0E6]"
                 />
               </div>
               {(
@@ -757,19 +757,19 @@ export function AdminDashboardPage() {
                 ] as const
               ).map(([field, label]) => (
                 <div key={field}>
-                  <label className="block text-xs font-semibold text-[#57534E]">{label}</label>
+                  <label className="block text-xs font-semibold text-[#9CA3AF]">{label}</label>
                   <div className="mt-1 flex items-center gap-2">
                     <input
                       type="color"
                       value={newTheme[field]}
                       onChange={(e) => setNewTheme((p) => ({ ...p, [field]: e.target.value }))}
-                      className="h-9 w-12 cursor-pointer rounded border border-[#D6CEC0] bg-white p-0.5"
+                      className="h-9 w-12 cursor-pointer rounded border border-[#2A313F] bg-[#151921] p-0.5"
                     />
                     <input
                       type="text"
                       value={newTheme[field]}
                       onChange={(e) => setNewTheme((p) => ({ ...p, [field]: e.target.value }))}
-                      className="w-full rounded border border-[#D6CEC0] px-2.5 py-1.5 font-mono text-xs text-[#1C1917]"
+                      className="w-full rounded border border-[#2A313F] px-2.5 py-1.5 font-mono text-xs text-[#F5F0E6]"
                     />
                   </div>
                 </div>
@@ -786,7 +786,7 @@ export function AdminDashboardPage() {
                 </div>
                 <button
                   type="submit"
-                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded border border-[#14472B] bg-[#1B5E3A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#14472B]"
+                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded border border-[#B59124] bg-[#D4AF37] px-4 py-2 text-sm font-semibold text-[#0D0F12] hover:bg-[#E5C158]"
                 >
                   <Plus className="h-4 w-4" />
                   Add Theme
@@ -800,7 +800,7 @@ export function AdminDashboardPage() {
             {themes.map((t) => (
               <div
                 key={t.id}
-                className="flex flex-col justify-between rounded border border-[#DDD6C8] bg-white p-4"
+                className="flex flex-col justify-between rounded border border-[#2A313F] bg-[#151921] p-4"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
@@ -814,15 +814,15 @@ export function AdminDashboardPage() {
                       <div style={{ backgroundColor: t.lightSquare }} />
                     </div>
                     <div>
-                      <div className="flex items-center gap-1.5 font-semibold text-[#1C1917]">
+                      <div className="flex items-center gap-1.5 font-semibold text-[#F5F0E6]">
                         {t.name}
                         {t.isDefault && (
-                          <span className="rounded bg-[#1B5E3A]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#1B5E3A]">
+                          <span className="rounded bg-[#D4AF37]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#D4AF37]">
                             DEFAULT
                           </span>
                         )}
                       </div>
-                      <p className="mt-0.5 text-xs text-[#57534E]">{t.description}</p>
+                      <p className="mt-0.5 text-xs text-[#9CA3AF]">{t.description}</p>
                     </div>
                   </div>
                 </div>
@@ -840,8 +840,8 @@ export function AdminDashboardPage() {
                       }}
                       className={`rounded border px-2.5 py-1 text-xs font-semibold ${
                         t.isActive
-                          ? 'border-[#1B5E3A]/30 bg-[#1B5E3A]/10 text-[#1B5E3A]'
-                          : 'border-[#D6CEC0] bg-[#F6F3EC] text-[#57534E]'
+                          ? 'border-[#D4AF37]/30 bg-[#D4AF37]/10 text-[#D4AF37]'
+                          : 'border-[#2A313F] bg-[#1B202A] text-[#9CA3AF]'
                       }`}
                     >
                       {t.isActive ? 'Active' : 'Hidden'}
@@ -856,7 +856,7 @@ export function AdminDashboardPage() {
                           });
                           await loadAll();
                         }}
-                        className="inline-flex items-center gap-1 rounded border border-[#D6CEC0] bg-white px-2.5 py-1 text-xs font-medium text-[#1C1917] hover:bg-[#FAF8F4]"
+                        className="inline-flex items-center gap-1 rounded border border-[#2A313F] bg-[#151921] px-2.5 py-1 text-xs font-medium text-[#F5F0E6] hover:bg-[#0D0F12]"
                       >
                         <Star className="h-3 w-3" />
                         Set Default
@@ -908,42 +908,42 @@ export function AdminDashboardPage() {
                 setError(err instanceof Error ? err.message : 'Failed to add plugin.');
               }
             }}
-            className="rounded border border-[#DDD6C8] bg-white p-5"
+            className="rounded border border-[#2A313F] bg-[#151921] p-5"
           >
-            <h2 className="font-editorial text-lg font-bold text-[#1C1917]">
+            <h2 className="font-editorial text-lg font-bold text-[#F5F0E6]">
               Register Integrated Plugin
             </h2>
-            <p className="mt-0.5 text-xs text-[#57534E]">
+            <p className="mt-0.5 text-xs text-[#9CA3AF]">
               Add and configure platform plugins (UI modules, sound effects, banners, or gameplay extensions).
             </p>
             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div>
-                <label className="block text-xs font-semibold text-[#57534E]">Plugin Name</label>
+                <label className="block text-xs font-semibold text-[#9CA3AF]">Plugin Name</label>
                 <input
                   type="text"
                   required
                   value={newPlugin.name}
                   onChange={(e) => setNewPlugin((p) => ({ ...p, name: e.target.value }))}
                   placeholder="e.g. Tournament Clock"
-                  className="mt-1 w-full rounded border border-[#D6CEC0] px-3 py-2 text-sm text-[#1C1917]"
+                  className="mt-1 w-full rounded border border-[#2A313F] px-3 py-2 text-sm text-[#F5F0E6]"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#57534E]">Slug (optional)</label>
+                <label className="block text-xs font-semibold text-[#9CA3AF]">Slug (optional)</label>
                 <input
                   type="text"
                   value={newPlugin.slug}
                   onChange={(e) => setNewPlugin((p) => ({ ...p, slug: e.target.value }))}
                   placeholder="tournament-clock"
-                  className="mt-1 w-full rounded border border-[#D6CEC0] px-3 py-2 font-mono text-sm text-[#1C1917]"
+                  className="mt-1 w-full rounded border border-[#2A313F] px-3 py-2 font-mono text-sm text-[#F5F0E6]"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#57534E]">Category</label>
+                <label className="block text-xs font-semibold text-[#9CA3AF]">Category</label>
                 <select
                   value={newPlugin.category}
                   onChange={(e) => setNewPlugin((p) => ({ ...p, category: e.target.value }))}
-                  className="mt-1 w-full rounded border border-[#D6CEC0] bg-white px-3 py-2 text-sm text-[#1C1917]"
+                  className="mt-1 w-full rounded border border-[#2A313F] bg-[#151921] px-3 py-2 text-sm text-[#F5F0E6]"
                 >
                   <option value="gameplay">gameplay</option>
                   <option value="ui">ui</option>
@@ -953,36 +953,36 @@ export function AdminDashboardPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-[#57534E]">Version</label>
+                <label className="block text-xs font-semibold text-[#9CA3AF]">Version</label>
                 <input
                   type="text"
                   value={newPlugin.version}
                   onChange={(e) => setNewPlugin((p) => ({ ...p, version: e.target.value }))}
-                  className="mt-1 w-full rounded border border-[#D6CEC0] px-3 py-2 font-mono text-sm text-[#1C1917]"
+                  className="mt-1 w-full rounded border border-[#2A313F] px-3 py-2 font-mono text-sm text-[#F5F0E6]"
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-xs font-semibold text-[#57534E]">Description</label>
+                <label className="block text-xs font-semibold text-[#9CA3AF]">Description</label>
                 <input
                   type="text"
                   value={newPlugin.description}
                   onChange={(e) => setNewPlugin((p) => ({ ...p, description: e.target.value }))}
                   placeholder="What this plugin integrates or controls"
-                  className="mt-1 w-full rounded border border-[#D6CEC0] px-3 py-2 text-sm text-[#1C1917]"
+                  className="mt-1 w-full rounded border border-[#2A313F] px-3 py-2 text-sm text-[#F5F0E6]"
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-xs font-semibold text-[#57534E]">Config JSON</label>
+                <label className="block text-xs font-semibold text-[#9CA3AF]">Config JSON</label>
                 <div className="mt-1 flex gap-2">
                   <input
                     type="text"
                     value={newPlugin.configJson}
                     onChange={(e) => setNewPlugin((p) => ({ ...p, configJson: e.target.value }))}
-                    className="w-full rounded border border-[#D6CEC0] px-3 py-2 font-mono text-xs text-[#1C1917]"
+                    className="w-full rounded border border-[#2A313F] px-3 py-2 font-mono text-xs text-[#F5F0E6]"
                   />
                   <button
                     type="submit"
-                    className="inline-flex shrink-0 items-center gap-1.5 rounded border border-[#14472B] bg-[#1B5E3A] px-4 py-2 text-sm font-semibold text-white hover:bg-[#14472B]"
+                    className="inline-flex shrink-0 items-center gap-1.5 rounded border border-[#B59124] bg-[#D4AF37] px-4 py-2 text-sm font-semibold text-[#0D0F12] hover:bg-[#E5C158]"
                   >
                     <Plus className="h-4 w-4" />
                     Add Plugin
@@ -997,18 +997,18 @@ export function AdminDashboardPage() {
             {plugins.map((pl) => (
               <div
                 key={pl.id}
-                className="flex flex-col justify-between rounded border border-[#DDD6C8] bg-white p-4"
+                className="flex flex-col justify-between rounded border border-[#2A313F] bg-[#151921] p-4"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-[#1C1917]">{pl.name}</span>
-                        <span className="rounded border border-[#DDD6C8] bg-[#F6F3EC] px-1.5 py-0.5 font-mono text-[10px] uppercase text-[#57534E]">
+                        <span className="font-semibold text-[#F5F0E6]">{pl.name}</span>
+                        <span className="rounded border border-[#2A313F] bg-[#1B202A] px-1.5 py-0.5 font-mono text-[10px] uppercase text-[#9CA3AF]">
                           {pl.category} · v{pl.version}
                         </span>
                       </div>
-                      <p className="mt-1 text-xs text-[#57534E]">{pl.description}</p>
+                      <p className="mt-1 text-xs text-[#9CA3AF]">{pl.description}</p>
                     </div>
                     <button
                       type="button"
@@ -1021,8 +1021,8 @@ export function AdminDashboardPage() {
                       }}
                       className={`shrink-0 rounded border px-2.5 py-1 text-xs font-semibold ${
                         pl.enabled
-                          ? 'border-[#1B5E3A]/30 bg-[#1B5E3A]/10 text-[#1B5E3A]'
-                          : 'border-[#D6CEC0] bg-[#F6F3EC] text-[#57534E]'
+                          ? 'border-[#D4AF37]/30 bg-[#D4AF37]/10 text-[#D4AF37]'
+                          : 'border-[#2A313F] bg-[#1B202A] text-[#9CA3AF]'
                       }`}
                     >
                       {pl.enabled ? 'Enabled' : 'Disabled'}
@@ -1030,7 +1030,7 @@ export function AdminDashboardPage() {
                   </div>
 
                   <div className="mt-3">
-                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#57534E]">
+                    <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#9CA3AF]">
                       Plugin Configuration (JSON)
                     </label>
                     <textarea
@@ -1039,7 +1039,7 @@ export function AdminDashboardPage() {
                       onChange={(e) =>
                         setPluginConfigs((prev) => ({ ...prev, [pl.id]: e.target.value }))
                       }
-                      className="mt-1 w-full rounded border border-[#D6CEC0] bg-[#FAF8F4] p-2 font-mono text-xs text-[#1C1917]"
+                      className="mt-1 w-full rounded border border-[#2A313F] bg-[#0D0F12] p-2 font-mono text-xs text-[#F5F0E6]"
                     />
                   </div>
                 </div>
@@ -1061,7 +1061,7 @@ export function AdminDashboardPage() {
                         setError(err instanceof Error ? err.message : 'Invalid JSON config.');
                       }
                     }}
-                    className="inline-flex items-center gap-1.5 rounded border border-[#14472B] bg-[#1B5E3A] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#14472B]"
+                    className="inline-flex items-center gap-1.5 rounded border border-[#B59124] bg-[#D4AF37] px-3 py-1.5 text-xs font-semibold text-[#0D0F12] hover:bg-[#E5C158]"
                   >
                     <CheckCircle2 className="h-3.5 w-3.5" />
                     Save Config

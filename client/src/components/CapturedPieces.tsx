@@ -75,7 +75,7 @@ export function CapturedPieces({
 
   return (
     <div className="flex min-h-[24px] items-center gap-1.5 text-sm">
-      <div className="flex flex-wrap items-center gap-0.5 leading-none text-[#1C1917]">
+      <div className="flex flex-wrap items-center gap-0.5 leading-none text-[#F5F0E6]">
         {pieces.length > 0 ? (
           pieces.map((symbol, idx) => (
             <span key={`${symbol}-${idx}`} className="text-base">
@@ -83,11 +83,11 @@ export function CapturedPieces({
             </span>
           ))
         ) : (
-          <span className="text-xs text-[#78716C]">No captures</span>
+          <span className="text-xs text-[#6B7280]">No captures</span>
         )}
       </div>
       {advantage > 0 && (
-        <span className="rounded border border-[#DDD6C8] bg-[#F6F3EC] px-1.5 py-0.5 text-xs font-semibold text-[#1B5E3A]">
+        <span className="rounded border border-[#D4AF37]/40 bg-[#D4AF37]/15 px-1.5 py-0.5 text-xs font-semibold text-[#F5E199]">
           +{advantage}
         </span>
       )}

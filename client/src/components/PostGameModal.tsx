@@ -48,19 +48,19 @@ export function PostGameModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1C1917]/60 p-4">
-      <div className="w-full max-w-md rounded border border-[#1C1917] bg-white p-6">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded border border-[#DDD6C8] bg-[#F6F3EC] text-[#1B5E3A]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded border border-[#D4AF37]/50 bg-[#151921] p-6 shadow-2xl">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded border border-[#D4AF37]/40 bg-[#1B202A] text-[#D4AF37]">
           {isDraw ? (
             <Handshake className="h-6 w-6" />
           ) : (
             <Award className="h-6 w-6" />
           )}
         </div>
-        <h2 className="text-center text-2xl font-bold text-[#1C1917]">{title}</h2>
-        <p className="mt-2 text-center text-sm text-[#57534E]">{subtitle}</p>
+        <h2 className="text-center text-2xl font-bold text-[#F5F0E6]">{title}</h2>
+        <p className="mt-2 text-center text-sm text-[#9CA3AF]">{subtitle}</p>
         {earnedPts !== undefined && (
-          <div className="mx-auto mt-3 w-fit rounded border border-[#1B5E3A]/30 bg-[#1B5E3A]/10 px-3 py-1 text-xs font-semibold text-[#1B5E3A]">
+          <div className="mx-auto mt-3 w-fit rounded border border-[#D4AF37]/40 bg-[#D4AF37]/15 px-3 py-1 text-xs font-semibold text-[#F5E199]">
             +{earnedPts} Points &amp; XP earned
           </div>
         )}
@@ -68,14 +68,14 @@ export function PostGameModal({
         <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
           <button
             onClick={onReturnToLobby}
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded border border-[#14472B] bg-[#1B5E3A] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#14472B]"
+            className="inline-flex flex-1 items-center justify-center gap-2 rounded border border-[#B59124] bg-[#D4AF37] px-4 py-2.5 text-sm font-semibold text-[#0D0F12] transition hover:bg-[#E5C158]"
           >
             <RotateCcw className="h-4 w-4" />
             Back to Lobby
           </button>
           <button
             onClick={onClose}
-            className="flex-1 rounded border border-[#D6CEC0] bg-[#F6F3EC] px-4 py-2.5 text-sm font-medium text-[#1C1917] transition hover:bg-[#EAE3D5]"
+            className="flex-1 rounded border border-[#2A313F] bg-[#1B202A] px-4 py-2.5 text-sm font-medium text-[#F5F0E6] transition hover:bg-[#232A36]"
           >
             Review Board
           </button>
