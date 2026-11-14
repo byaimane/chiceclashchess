@@ -2,6 +2,25 @@ import type { ArenaTheme, PluginItem } from '../types';
 import { apiRequest } from './api';
 
 const THEME_STORAGE_KEY = 'choiceclash_arena_theme';
+const VIEW_MODE_STORAGE_KEY = 'choiceclash_arena_view_mode';
+
+export type ArenaViewMode = '2d' | '3d';
+
+export function getStoredViewMode(): ArenaViewMode {
+  try {
+    return localStorage.getItem(VIEW_MODE_STORAGE_KEY) === '3d' ? '3d' : '2d';
+  } catch {
+    return '2d';
+  }
+}
+
+export function setStoredViewMode(mode: ArenaViewMode): void {
+  try {
+    localStorage.setItem(VIEW_MODE_STORAGE_KEY, mode);
+  } catch {
+    // Ignore storage errors
+  }
+}
 
 export const FALLBACK_THEMES: ArenaTheme[] = [
   {

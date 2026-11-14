@@ -21,9 +21,12 @@ import {
   fetchArenaThemes,
   fetchEnabledPlugins,
   getStoredThemeSlug,
+  getStoredViewMode,
   parsePluginConfig,
   savePreferredTheme,
   setStoredThemeSlug,
+  setStoredViewMode,
+  type ArenaViewMode,
 } from '../lib/arenaConfig';
 import { formatUsd, getLevelInfo } from '../lib/progression';
 import { getSocket } from '../lib/socket';
@@ -59,6 +62,7 @@ export function LobbyPage() {
   const [selectedTheme, setSelectedTheme] = useState<string>(
     user?.preferredThemeSlug || getStoredThemeSlug()
   );
+  const [viewMode, setViewMode] = useState<ArenaViewMode>(getStoredViewMode);
   const [savingTheme, setSavingTheme] = useState(false);
   const [plugins, setPlugins] = useState<PluginItem[]>([]);
 
@@ -297,12 +301,44 @@ export function LobbyPage() {
           <div className="flex items-center gap-2">
             <Palette className="h-4 w-4 text-[#1B5E3A]" />
             <h2 className="font-editorial text-lg font-bold text-[#1C1917]">
-              Playing Arena Theme
+              Playing Arena Theme &amp; View
             </h2>
           </div>
-          <span className="text-xs text-[#57534E]">
-            {savingTheme ? 'Saving preference...' : 'Choose your 2D board & arena style'}
-          </span>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="inline-flex overflow-hidden rounded border border-[#D6CEC0] bg-[#FAF8F4]">
+              <button
+                type="button"
+                onClick={() => {
+                  setViewMode('2d');
+                  setStoredViewMode('2d');
+                }}
+                className={`px-3 py-1 text-xs font-semibold transition ${
+                  viewMode === '2d'
+                    ? 'bg-[#1B5E3A] text-white'
+                    : 'text-[#1C1917] hover:bg-white'
+                }`}
+              >
+                2D Board
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setViewMode('3d');
+                  setStoredViewMode('3d');
+                }}
+                className={`px-3 py-1 text-xs font-semibold transition ${
+                  viewMode === '3d'
+                    ? 'bg-[#1B5E3A] text-white'
+                    : 'text-[#1C1917] hover:bg-white'
+                }`}
+              >
+                3D Arena
+              </button>
+            </div>
+            <span className="text-xs text-[#57534E]">
+              {savingTheme ? 'Saving preference...' : 'Choose your board style'}
+            </span>
+          </div>
         </div>
 
         <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

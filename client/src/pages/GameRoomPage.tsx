@@ -1,5 +1,6 @@
 import { Chess, type Square } from 'chess.js';
 import {
+  Box,
   Check,
   Copy,
   Flag,
@@ -14,6 +15,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { useNavigate, useParams } from 'react-router-dom';
 import { CapturedPieces } from '../components/CapturedPieces';
+import { Chessboard3D, type LegalTarget } from '../components/Chessboard3D';
 import { GameChat } from '../components/GameChat';
 import { MoveHistory } from '../components/MoveHistory';
 import { PostGameModal } from '../components/PostGameModal';
@@ -23,10 +25,13 @@ import {
   fetchArenaThemes,
   fetchEnabledPlugins,
   getStoredThemeSlug,
+  getStoredViewMode,
   parsePluginConfig,
   playChessSound,
   savePreferredTheme,
   setStoredThemeSlug,
+  setStoredViewMode,
+  type ArenaViewMode,
 } from '../lib/arenaConfig';
 import { getSocket } from '../lib/socket';
 import type {
@@ -50,6 +55,7 @@ export function GameRoomPage() {
   const [showModal, setShowModal] = useState(false);
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [viewMode, setViewMode] = useState<ArenaViewMode>(getStoredViewMode);
   const [themes, setThemes] = useState<ArenaTheme[]>(FALLBACK_THEMES);
   const [themeSlug, setThemeSlug] = useState<string>(
     user?.preferredThemeSlug || getStoredThemeSlug()
@@ -98,6 +104,11 @@ export function GameRoomPage() {
     } catch {
       // Saved locally
     }
+  };
+
+  const handleViewModeChange = (mode: ArenaViewMode) => {
+    setViewMode(mode);
+    setStoredViewMode(mode);
   };
 
   useEffect(() => {
@@ -231,6 +242,14 @@ export function GameRoomPage() {
     snapshot?.status === 'ACTIVE' &&
     snapshot?.yourColor !== null &&
     snapshot?.turn === snapshot?.yourColor;
+
+  const legalTargets = useMemo<LegalTarget[]>(() => {
+    if (!selectedSquare || !isMyTurn) return [];
+    return chess.moves({ square: selectedSquare, verbose: true }).map((move) => ({
+      square: move.to as Square,
+      isCapture: Boolean(move.captured),
+    }));
+  }, [chess, selectedSquare, isMyTurn]);
 
   const optionSquares = useMemo(() => {
     const styles: Record<string, React.CSSProperties> = {};
@@ -440,7 +459,32 @@ export function GameRoomPage() {
               <span className="font-mono text-xs font-semibold text-[#57534E]">
                 ARENA · {snapshot.roomCode}
               </span>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex overflow-hidden rounded border border-[#D6CEC0] bg-white">
+                  <button
+                    type="button"
+                    onClick={() => handleViewModeChange('2d')}
+                    className={`px-2.5 py-1 text-xs font-semibold transition ${
+                      viewMode === '2d'
+                        ? 'bg-[#1B5E3A] text-white'
+                        : 'text-[#1C1917] hover:bg-[#FAF8F4]'
+                    }`}
+                  >
+                    2D
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleViewModeChange('3d')}
+                    className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold transition ${
+                      viewMode === '3d'
+                        ? 'bg-[#1B5E3A] text-white'
+                        : 'text-[#1C1917] hover:bg-[#FAF8F4]'
+                    }`}
+                  >
+                    <Box className="h-3 w-3" />
+                    3D
+                  </button>
+                </div>
                 <select
                   value={activeTheme.slug}
                   onChange={(e) => handleThemeChange(e.target.value)}
@@ -504,27 +548,42 @@ export function GameRoomPage() {
               </div>
             </div>
 
-            {/* Flat 2D Chessboard */}
+            {/* 2D or 3D Chessboard */}
             <div
               className="touch-none select-none border-2 bg-white"
               style={{ borderColor: activeTheme.boardBorder }}
             >
-              <Chessboard
-                id="multiplayer-board"
-                boardWidth={boardWidth}
-                position={snapshot.fen}
-                boardOrientation={boardOrientation}
-                showBoardNotation={showBoardNotation}
-                onPieceDrop={onPieceDrop}
-                onPieceDragBegin={onPieceDragBegin}
-                onSquareClick={onSquareClick}
-                customSquareStyles={optionSquares}
-                arePiecesDraggable={isMyTurn}
-                customBoardStyle={{ borderRadius: '0px', boxShadow: 'none', cursor: isMyTurn ? 'pointer' : 'default' }}
-                customDarkSquareStyle={{ backgroundColor: activeTheme.darkSquare }}
-                customLightSquareStyle={{ backgroundColor: activeTheme.lightSquare }}
-                animationDuration={120}
-              />
+              {viewMode === '3d' ? (
+                <Chessboard3D
+                  fen={snapshot.fen}
+                  boardOrientation={boardOrientation}
+                  boardWidth={boardWidth}
+                  lightSquare={activeTheme.lightSquare}
+                  darkSquare={activeTheme.darkSquare}
+                  boardBorder={activeTheme.boardBorder}
+                  arenaBg={activeTheme.arenaBg}
+                  selectedSquare={selectedSquare}
+                  legalTargets={legalTargets}
+                  onSquareClick={onSquareClick}
+                />
+              ) : (
+                <Chessboard
+                  id="multiplayer-board"
+                  boardWidth={boardWidth}
+                  position={snapshot.fen}
+                  boardOrientation={boardOrientation}
+                  showBoardNotation={showBoardNotation}
+                  onPieceDrop={onPieceDrop}
+                  onPieceDragBegin={onPieceDragBegin}
+                  onSquareClick={onSquareClick}
+                  customSquareStyles={optionSquares}
+                  arePiecesDraggable={isMyTurn}
+                  customBoardStyle={{ borderRadius: '0px', boxShadow: 'none', cursor: isMyTurn ? 'pointer' : 'default' }}
+                  customDarkSquareStyle={{ backgroundColor: activeTheme.darkSquare }}
+                  customLightSquareStyle={{ backgroundColor: activeTheme.lightSquare }}
+                  animationDuration={120}
+                />
+              )}
             </div>
 
             {/* Bottom Player Bar */}
