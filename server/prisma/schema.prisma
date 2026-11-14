@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String          @id @default(cuid())
+  username       String          @unique
+  email          String          @unique
+  passwordHash   String
+  role           String          @default("USER")
+  isBanned       Boolean         @default(false)
+  wins           Int             @default(0)
+  losses         Int             @default(0)
+  draws          Int             @default(0)
+  xp             Int             @default(0)
+  points         Int             @default(0)
+  level          Int             @default(1)
+  walletCents    Int             @default(0)
+  gamesAsWhite   Game[]          @relation("WhitePlayer")
+  gamesAsBlack   Game[]          @relation("BlackPlayer")
+  payoutRequests PayoutRequest[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model PayoutRequest {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pointsSpent  Int
+  amountCents  Int
+  payoutMethod String
+  destination  String
+  status       String    @default("PENDING")
+  createdAt    DateTime  @default(now())
+  processedAt  DateTime?
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Game {
+  id            String    @id @default(cuid())
+  roomCode      String    @unique
+  whitePlayerId String?
+  blackPlayerId String?
+  whitePlayer   User?     @relation("WhitePlayer", fields: [whitePlayerId], references: [id])
+  blackPlayer   User?     @relation("BlackPlayer", fields: [blackPlayerId], references: [id])
+  status        String    @default("WAITING")
+  result        String?
+  endReason     String?
+  pgn           String    @default("")
+  fen           String    @default("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  completedAt   DateTime?
+
+  @@index([roomCode])
+  @@index([whitePlayerId])
+  @@index([blackPlayerId])
+}
