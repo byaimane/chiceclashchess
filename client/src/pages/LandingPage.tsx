@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Download, Smartphone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -50,6 +50,37 @@ export function LandingPage() {
                 </Link>
               </>
             )}
+            <a
+              href="/downloads/ChoiceCLASH.apk"
+              download="ChoiceCLASH.apk"
+              className="inline-flex items-center gap-2 rounded border border-[#2E5D47] bg-[#112B20] px-5 py-3 text-sm font-semibold text-[#E6B84C] transition hover:border-[#E6B84C] hover:bg-[#17382A]"
+            >
+              <Download className="h-4 w-4" />
+              Download Android APK
+            </a>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-[#9CA3AF]">
+            <span className="inline-flex items-center gap-1.5 text-[#E6B84C]">
+              <Smartphone className="h-3.5 w-3.5" />
+              Android App (Royal Emerald &amp; Ivory)
+            </span>
+            <span>&bull;</span>
+            <a
+              href="/downloads/ChoiceCLASH.apk"
+              download="ChoiceCLASH.apk"
+              className="underline decoration-[#D4AF37]/50 underline-offset-4 hover:text-[#F5F0E6]"
+            >
+              ChoiceCLASH.apk (18.9 MB)
+            </a>
+            <span>&bull;</span>
+            <a
+              href="/downloads/ChoiceCLASH.aab"
+              download="ChoiceCLASH.aab"
+              className="underline decoration-[#D4AF37]/50 underline-offset-4 hover:text-[#F5F0E6]"
+            >
+              ChoiceCLASH.aab (16.2 MB)
+            </a>
           </div>
         </div>
 

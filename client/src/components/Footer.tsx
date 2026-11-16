@@ -5,7 +5,23 @@ export function Footer() {
         <p className="font-medium text-[#F5F0E6]">
           &#9818; Choice<span className="text-[#D4AF37]">CLASH</span> &mdash; Grandmaster 2D &amp; 3D Multiplayer Chess
         </p>
-        <p>&copy; {new Date().getFullYear()} ChoiceCLASH. All rights reserved.</p>
+        <div className="flex flex-wrap items-center gap-4">
+          <a
+            href="/downloads/ChoiceCLASH.apk"
+            download="ChoiceCLASH.apk"
+            className="font-medium text-[#D4AF37] underline decoration-[#D4AF37]/50 underline-offset-4 hover:text-[#E5C158]"
+          >
+            Download Android APK
+          </a>
+          <a
+            href="/downloads/ChoiceCLASH.aab"
+            download="ChoiceCLASH.aab"
+            className="text-[#9CA3AF] underline decoration-[#2A313F] underline-offset-4 hover:text-[#F5F0E6]"
+          >
+            AAB Bundle
+          </a>
+          <p>&copy; {new Date().getFullYear()} ChoiceCLASH. All rights reserved.</p>
+        </div>
       </div>
     </footer>
   );
