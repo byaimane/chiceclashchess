@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.choiceclash.chess.audio.ChessSoundEffects
 import com.choiceclash.chess.chess.AiDifficulty
 import com.choiceclash.chess.chess.AiPersonality
 import com.choiceclash.chess.chess.ChessAiEngine
@@ -47,8 +49,11 @@ import com.choiceclash.chess.chess.PieceColor
 import com.choiceclash.chess.chess.PositionEvaluation
 import com.choiceclash.chess.chess.PuzzlesRepository
 import com.choiceclash.chess.ui.components.AiReviewDialog
+import com.choiceclash.chess.ui.components.CapturedPiecesBar
 import com.choiceclash.chess.ui.components.ChessboardView
 import com.choiceclash.chess.ui.components.EvalBarView
+import com.choiceclash.chess.ui.components.MoveHistoryStrip
+import com.choiceclash.chess.ui.components.formatClockSeconds
 import com.choiceclash.chess.ui.theme.BrushedGold
 import com.choiceclash.chess.ui.theme.EmeraldBorder
 import com.choiceclash.chess.ui.theme.EmeraldElevated
@@ -61,6 +66,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+private enum class TimeControl(val label: String, val initialSec: Int, val incrementSec: Int) {
+    UNTIMED("Untimed", 0, 0),
+    BLITZ("3+2", 180, 2),
+    RAPID("10+0", 600, 0),
+}
+
 @Composable
 fun AiArenaScreen() {
     val context = LocalContext.current
@@ -70,6 +81,11 @@ fun AiArenaScreen() {
     var personality by remember { mutableStateOf(AiPersonality.BALANCED) }
     var playerColor by remember { mutableStateOf(PieceColor.WHITE) }
     var is3dMode by remember { mutableStateOf(false) }
+    var soundEnabled by remember { mutableStateOf(ChessSoundEffects.enabled) }
+    var timeControl by remember { mutableStateOf(TimeControl.UNTIMED) }
+    var whiteTimeSec by remember { mutableIntStateOf(0) }
+    var blackTimeSec by remember { mutableIntStateOf(0) }
+    var timeoutWinner by remember { mutableStateOf<PieceColor?>(null) }
 
     var board by remember { mutableStateOf(ChessBoard.start()) }
     var boardStack by remember { mutableStateOf(listOf(ChessBoard.start())) }
@@ -92,11 +108,15 @@ fun AiArenaScreen() {
     var reviewReport by remember { mutableStateOf<GameReviewReport?>(null) }
     var mistakesSaved by remember { mutableStateOf(false) }
 
-    val isGameOver = resigned || board.isGameOver()
+    val isGameOver = resigned || timeoutWinner != null || board.isGameOver()
     val opening = remember(historySan) { OpeningsBook.detect(historySan) }
 
-    fun resetGame(newColor: PieceColor = playerColor) {
+    fun resetGame(newColor: PieceColor = playerColor, newTc: TimeControl = timeControl) {
         playerColor = newColor
+        timeControl = newTc
+        whiteTimeSec = newTc.initialSec
+        blackTimeSec = newTc.initialSec
+        timeoutWinner = null
         val start = ChessBoard.start()
         board = start
         boardStack = listOf(start)
@@ -111,6 +131,29 @@ fun AiArenaScreen() {
         reviewReport = null
         mistakesSaved = false
         coachAnswer = "New match started! Ask me for a plan anytime."
+    }
+
+    // Live clock countdown when timed mode is active
+    LaunchedEffect(timeControl, board.turn, isGameOver, historySan.size) {
+        if (timeControl == TimeControl.UNTIMED || isGameOver || historySan.isEmpty()) return@LaunchedEffect
+        while (!isGameOver) {
+            delay(1000)
+            if (board.turn == PieceColor.WHITE) {
+                whiteTimeSec = (whiteTimeSec - 1).coerceAtLeast(0)
+                if (whiteTimeSec == 0) {
+                    timeoutWinner = PieceColor.BLACK
+                    ChessSoundEffects.playGameOver()
+                    break
+                }
+            } else {
+                blackTimeSec = (blackTimeSec - 1).coerceAtLeast(0)
+                if (blackTimeSec == 0) {
+                    timeoutWinner = PieceColor.WHITE
+                    ChessSoundEffects.playGameOver()
+                    break
+                }
+            }
+        }
     }
 
     // Update evaluation asynchronously whenever board changes
@@ -138,6 +181,16 @@ fun AiArenaScreen() {
                 hintFrom = null
                 hintTo = null
                 hintText = null
+                if (timeControl != TimeControl.UNTIMED && timeControl.incrementSec > 0) {
+                    if (playerColor == PieceColor.WHITE) blackTimeSec += timeControl.incrementSec
+                    else whiteTimeSec += timeControl.incrementSec
+                }
+                when {
+                    nextBoard.isGameOver() -> ChessSoundEffects.playGameOver()
+                    nextBoard.inCheck() -> ChessSoundEffects.playCheck()
+                    result.move.captured != null -> ChessSoundEffects.playCapture()
+                    else -> ChessSoundEffects.playMove()
+                }
             }
             aiThinking = false
         }
@@ -158,6 +211,7 @@ fun AiArenaScreen() {
     }
 
     val statusLabel = when {
+        timeoutWinner != null -> "${if (timeoutWinner == PieceColor.WHITE) "White" else "Black"} wins on time!"
         resigned -> "You resigned — AI wins"
         board.isCheckmate() -> {
             val winner = if (board.turn == PieceColor.WHITE) "Black" else "White"
@@ -199,6 +253,20 @@ fun AiArenaScreen() {
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                FilterChip(
+                    selected = soundEnabled,
+                    onClick = {
+                        soundEnabled = !soundEnabled
+                        ChessSoundEffects.enabled = soundEnabled
+                    },
+                    label = { Text(if (soundEnabled) "🔊" else "🔇", fontSize = 11.sp) },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = EmeraldElevated,
+                        selectedLabelColor = BrushedGold,
+                        containerColor = EmeraldSurface,
+                        labelColor = MutedSage
+                    )
+                )
                 FilterChip(
                     selected = is3dMode,
                     onClick = { is3dMode = !is3dMode },
@@ -260,10 +328,59 @@ fun AiArenaScreen() {
                     )
                 )
             }
+            Spacer(modifier = Modifier.width(4.dp))
+            TimeControl.entries.forEach { tc ->
+                FilterChip(
+                    selected = timeControl == tc,
+                    onClick = { resetGame(playerColor, tc) },
+                    label = { Text(tc.label, fontSize = 11.sp) },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = EmeraldElevated,
+                        selectedLabelColor = BrushedGold,
+                        containerColor = EmeraldSurface,
+                        labelColor = MutedSage
+                    )
+                )
+            }
         }
 
-        // Live Eval Bar + Opening Badge
+        if (timeControl != TimeControl.UNTIMED) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Surface(
+                    color = if (board.turn == PieceColor.WHITE && !isGameOver) BrushedGold.copy(alpha = 0.2f) else EmeraldSurface,
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.border(1.dp, EmeraldBorder, RoundedCornerShape(8.dp))
+                ) {
+                    Text(
+                        text = "♔ ${formatClockSeconds(whiteTimeSec)}",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = WarmIvory,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                    )
+                }
+                Surface(
+                    color = if (board.turn == PieceColor.BLACK && !isGameOver) BrushedGold.copy(alpha = 0.2f) else EmeraldSurface,
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.border(1.dp, EmeraldBorder, RoundedCornerShape(8.dp))
+                ) {
+                    Text(
+                        text = "♚ ${formatClockSeconds(blackTimeSec)}",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = BrushedGold,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                    )
+                }
+            }
+        }
+
+        // Live Eval Bar + Captured Pieces
         EvalBarView(evaluation = evaluation)
+        CapturedPiecesBar(board = board)
 
         opening?.let { op ->
             Surface(
@@ -305,8 +422,14 @@ fun AiArenaScreen() {
                 hintFrom = null
                 hintTo = null
                 hintText = null
+                if (timeControl != TimeControl.UNTIMED && timeControl.incrementSec > 0) {
+                    if (playerColor == PieceColor.WHITE) whiteTimeSec += timeControl.incrementSec
+                    else blackTimeSec += timeControl.incrementSec
+                }
             }
         )
+
+        MoveHistoryStrip(historySan = historySan)
 
         hintText?.let { txt ->
             Surface(

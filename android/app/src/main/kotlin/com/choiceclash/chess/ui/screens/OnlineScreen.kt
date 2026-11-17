@@ -54,8 +54,10 @@ import com.choiceclash.chess.data.RoomState
 import com.choiceclash.chess.data.SocketManager
 import com.choiceclash.chess.data.UserProfile
 import com.choiceclash.chess.ui.components.AiReviewDialog
+import com.choiceclash.chess.ui.components.CapturedPiecesBar
 import com.choiceclash.chess.ui.components.ChessboardView
 import com.choiceclash.chess.ui.components.EvalBarView
+import com.choiceclash.chess.ui.components.MoveHistoryStrip
 import com.choiceclash.chess.ui.theme.BrushedGold
 import com.choiceclash.chess.ui.theme.CrimsonAlert
 import com.choiceclash.chess.ui.theme.EmeraldBorder
@@ -614,6 +616,7 @@ private fun OnlineGameRoomView(
         }
 
         EvalBarView(evaluation = evaluation)
+        CapturedPiecesBar(board = board)
 
         ChessboardView(
             board = board,
@@ -632,6 +635,8 @@ private fun OnlineGameRoomView(
                 )
             }
         )
+
+        MoveHistoryStrip(historySan = room.historySan)
 
         // Draw offer banner
         if (room.drawOfferFrom != null && room.drawOfferFrom != currentUser.username) {

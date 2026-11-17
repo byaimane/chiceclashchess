@@ -34,10 +34,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.choiceclash.chess.audio.ChessSoundEffects
 import com.choiceclash.chess.chess.ChessBoard
 import com.choiceclash.chess.chess.ChessMove
 import com.choiceclash.chess.chess.ChessPiece
@@ -68,6 +71,18 @@ fun ChessboardView(
     modifier: Modifier = Modifier
 ) {
     val density = LocalDensity.current.density
+    val haptic = LocalHapticFeedback.current
+    fun triggerMoveFeedback(move: ChessMove) {
+        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        val after = board.applyMoveUnchecked(move)
+        when {
+            after.isGameOver() -> ChessSoundEffects.playGameOver()
+            after.inCheck() -> ChessSoundEffects.playCheck()
+            move.isCastleKingside || move.isCastleQueenside -> ChessSoundEffects.playCastle()
+            move.captured != null || move.isEnPassant -> ChessSoundEffects.playCapture()
+            else -> ChessSoundEffects.playMove()
+        }
+    }
     val boardTiltX by animateFloatAsState(
         targetValue = if (is3dMode) 26f else 0f,
         animationSpec = tween(durationMillis = 360),
@@ -116,6 +131,7 @@ fun ChessboardView(
                                 .clickable {
                                     pendingPromotionMoves = emptyList()
                                     selectedSquare = null
+                                    triggerMoveFeedback(move)
                                     onMoveSelected(move)
                                 }
                         ) {
@@ -207,7 +223,9 @@ fun ChessboardView(
                                                 pendingPromotionMoves = matchingMoves
                                             } else {
                                                 selectedSquare = null
-                                                onMoveSelected(matchingMoves.first())
+                                                val chosen = matchingMoves.first()
+                                                triggerMoveFeedback(chosen)
+                                                onMoveSelected(chosen)
                                             }
                                         } else if (piece != null &&
                                             piece.color == board.turn &&
