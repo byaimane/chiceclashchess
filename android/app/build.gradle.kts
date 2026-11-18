@@ -17,11 +17,11 @@ android {
   namespace = "com.choiceclash.chess"
   compileSdk = 36
   defaultConfig {
-    applicationId = "com.choiceclash.chess"
+    applicationId = "com.choiceclash.app"
     minSdk = 26
     targetSdk = 35
-    versionCode = 2
-    versionName = "1.1.0"
+    versionCode = 3
+    versionName = "1.1.1"
   }
 
   signingConfigs {
