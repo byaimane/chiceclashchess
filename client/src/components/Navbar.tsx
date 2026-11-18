@@ -1,7 +1,10 @@
-import { Download, Smartphone } from 'lucide-react';
+import { Download, Shield, Smartphone } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export function Navbar() {
+  const { user, logout } = useAuth();
+
   return (
     <header className="border-b border-[#2A313F] bg-[#11141B]/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -36,6 +39,33 @@ export function Navbar() {
           >
             AAB
           </a>
+          {user?.role === 'ADMIN' ? (
+            <>
+              <Link
+                to="/admin"
+                className="inline-flex items-center gap-1 rounded border border-[#D4AF37]/40 bg-[#D4AF37]/10 px-2.5 py-1.5 text-xs font-semibold text-[#F5E199] transition hover:bg-[#D4AF37]/20"
+              >
+                <Shield className="h-3.5 w-3.5" />
+                Admin
+              </Link>
+              <button
+                type="button"
+                onClick={logout}
+                className="rounded border border-[#2A313F] px-2.5 py-1.5 text-xs font-medium text-[#9CA3AF] hover:text-[#F5F0E6]"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/admin"
+              className="inline-flex items-center gap-1 rounded border border-[#2A313F] px-2.5 py-1.5 text-xs font-medium text-[#9CA3AF] transition hover:border-[#D4AF37]/40 hover:text-[#F5F0E6]"
+              title="Admin Dashboard"
+            >
+              <Shield className="h-3.5 w-3.5" />
+              <span className="hidden md:inline">Admin</span>
+            </Link>
+          )}
         </nav>
       </div>
     </header>

@@ -6,7 +6,7 @@ export function LoginPage() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = (location.state as { from?: string } | null)?.from || '/lobby';
+  const from = (location.state as { from?: string } | null)?.from || '/admin';
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -14,7 +14,7 @@ export function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
 
   if (user) {
-    return <Navigate to={user.role === 'ADMIN' ? '/admin' : '/lobby'} replace />;
+    return <Navigate to={user.role === 'ADMIN' ? '/admin' : '/'} replace />;
   }
 
   const handleSubmit = async (e: FormEvent) => {
@@ -84,9 +84,9 @@ export function LoginPage() {
         </form>
 
         <p className="mt-6 text-center text-sm text-[#9CA3AF]">
-          New to ChoiceCLASH?{' '}
-          <Link to="/signup" className="font-semibold text-[#D4AF37] hover:underline">
-            Create an account
+          Looking to play?{' '}
+          <Link to="/" className="font-semibold text-[#D4AF37] hover:underline">
+            Download the Android App
           </Link>
         </p>
       </div>

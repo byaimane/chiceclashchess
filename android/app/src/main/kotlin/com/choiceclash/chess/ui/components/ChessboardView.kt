@@ -24,6 +24,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.choiceclash.chess.audio.ChessSoundEffects
+import com.choiceclash.chess.data.RemoteConfigManager
 import com.choiceclash.chess.chess.ChessBoard
 import com.choiceclash.chess.chess.ChessMove
 import com.choiceclash.chess.chess.ChessPiece
@@ -72,6 +74,16 @@ fun ChessboardView(
 ) {
     val density = LocalDensity.current.density
     val haptic = LocalHapticFeedback.current
+    val remoteState by RemoteConfigManager.state.collectAsState()
+    val lightSqColor = remember(remoteState.selectedTheme) {
+        RemoteConfigManager.parseHexColor(remoteState.selectedTheme?.lightSquareHex, BoardLightSquare)
+    }
+    val darkSqColor = remember(remoteState.selectedTheme) {
+        RemoteConfigManager.parseHexColor(remoteState.selectedTheme?.darkSquareHex, BoardDarkSquare)
+    }
+    val borderColor = remember(remoteState.selectedTheme) {
+        RemoteConfigManager.parseHexColor(remoteState.selectedTheme?.boardBorderHex, EmeraldBorder)
+    }
     fun triggerMoveFeedback(move: ChessMove) {
         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
         val after = board.applyMoveUnchecked(move)
@@ -177,7 +189,7 @@ fun ChessboardView(
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .border(2.dp, EmeraldBorder, RoundedCornerShape(12.dp))
+                .border(2.dp, borderColor, RoundedCornerShape(12.dp))
                 .padding(3.dp)
                 .clip(RoundedCornerShape(8.dp))
         ) {
@@ -202,7 +214,7 @@ fun ChessboardView(
                                 piece?.type == PieceType.KING &&
                                 piece.color == board.turn
 
-                            val baseBg = if (isLight) BoardLightSquare else BoardDarkSquare
+                            val baseBg = if (isLight) lightSqColor else darkSqColor
                             val overlayColor = when {
                                 isCheckedKing -> CrimsonAlert.copy(alpha = 0.65f)
                                 isSelected -> BrushedGold.copy(alpha = 0.55f)
@@ -245,7 +257,7 @@ fun ChessboardView(
                                         text = rankLabel,
                                         fontSize = 9.sp,
                                         fontWeight = FontWeight.SemiBold,
-                                        color = if (isLight) BoardDarkSquare else BoardLightSquare,
+                                        color = if (isLight) darkSqColor else lightSqColor,
                                         modifier = Modifier
                                             .align(Alignment.TopStart)
                                             .padding(start = 2.dp, top = 1.dp)
@@ -259,7 +271,7 @@ fun ChessboardView(
                                         text = fileLabel,
                                         fontSize = 9.sp,
                                         fontWeight = FontWeight.SemiBold,
-                                        color = if (isLight) BoardDarkSquare else BoardLightSquare,
+                                        color = if (isLight) darkSqColor else lightSqColor,
                                         modifier = Modifier
                                             .align(Alignment.BottomEnd)
                                             .padding(end = 2.dp, bottom = 1.dp)
