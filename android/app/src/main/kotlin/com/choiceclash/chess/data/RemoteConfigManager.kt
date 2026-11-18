@@ -12,8 +12,8 @@ import okhttp3.Request
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
-const val CURRENT_VERSION_CODE = 5
-const val CURRENT_VERSION_NAME = "1.3.0"
+const val CURRENT_VERSION_CODE = 6
+const val CURRENT_VERSION_NAME = "1.3.1"
 const val VERCEL_VERSION_URL = "https://choiceclash.vercel.app/version.json"
 
 private const val PREFS_REMOTE = "choiceclash_remote_config"

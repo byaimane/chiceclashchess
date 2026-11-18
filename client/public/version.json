@@ -1,6 +1,6 @@
 {
-  "versionCode": 5,
-  "versionName": "1.3.0",
+  "versionCode": 6,
+  "versionName": "1.3.1",
   "apkUrl": "https://choiceclash.vercel.app/downloads/ChoiceCLASH.apk",
-  "releaseNotes": "v1.3.0: Live Admin Panel Sync (Dynamic Board Themes & Announcements), In-App Update Checker, and 12-Stage Royal Odyssey Adventure Map."
+  "releaseNotes": "v1.3.1: Targets Android API level 36, Live Admin Panel Sync, In-App Update Checker, and 12-Stage Royal Odyssey Adventure Map."
 }
