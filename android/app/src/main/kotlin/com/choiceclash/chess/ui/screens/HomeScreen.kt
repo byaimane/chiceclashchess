@@ -20,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Extension
+import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material.icons.rounded.SmartToy
 import androidx.compose.material3.Icon
@@ -46,6 +47,7 @@ import com.choiceclash.chess.ui.theme.WarmIvory
 
 @Composable
 fun HomeScreen(
+    onOpenAdventure: () -> Unit,
     onOpenAiArena: () -> Unit,
     onOpenPuzzles: () -> Unit,
     onOpenOnline: () -> Unit
@@ -121,6 +123,15 @@ fun HomeScreen(
             fontWeight = FontWeight.Bold,
             letterSpacing = 1.4.sp,
             color = BrushedGold
+        )
+
+        ArenaLaunchCard(
+            icon = Icons.Rounded.Map,
+            badge = "12-STAGE CAMPAIGN",
+            title = "Royal Odyssey Map",
+            subtitle = "Travel across 4 realms—every win unlocks the next location, boss & 3-star mastery.",
+            accent = BrushedGold,
+            onClick = onOpenAdventure
         )
 
         ArenaLaunchCard(

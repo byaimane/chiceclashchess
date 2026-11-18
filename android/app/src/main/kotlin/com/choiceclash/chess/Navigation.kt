@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Extension
 import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material.icons.rounded.SmartToy
 import androidx.compose.material3.Icon
@@ -23,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.choiceclash.chess.ui.screens.AdventureScreen
 import com.choiceclash.chess.ui.screens.AiArenaScreen
 import com.choiceclash.chess.ui.screens.HomeScreen
 import com.choiceclash.chess.ui.screens.OnlineScreen
@@ -35,6 +37,7 @@ import com.choiceclash.chess.ui.theme.MutedSage
 
 private enum class AppTab(val label: String, val icon: ImageVector) {
     HOME("Home", Icons.Rounded.Home),
+    MAP("Map", Icons.Rounded.Map),
     AI_ARENA("Play AI", Icons.Rounded.SmartToy),
     PUZZLES("Puzzles", Icons.Rounded.Extension),
     ONLINE("Online", Icons.Rounded.Public),
@@ -84,10 +87,12 @@ fun MainNavigation() {
         Box(modifier = Modifier.padding(innerPadding)) {
             when (currentTab) {
                 AppTab.HOME -> HomeScreen(
+                    onOpenAdventure = { currentTab = AppTab.MAP },
                     onOpenAiArena = { currentTab = AppTab.AI_ARENA },
                     onOpenPuzzles = { currentTab = AppTab.PUZZLES },
                     onOpenOnline = { currentTab = AppTab.ONLINE }
                 )
+                AppTab.MAP -> AdventureScreen()
                 AppTab.AI_ARENA -> AiArenaScreen()
                 AppTab.PUZZLES -> PuzzlesScreen()
                 AppTab.ONLINE -> OnlineScreen()

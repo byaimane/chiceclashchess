@@ -12,7 +12,7 @@ export function LandingPage() {
       <div className="grid items-center gap-12 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <p className="inline-flex items-center gap-2 rounded border border-[#E6B84C]/40 bg-[#112B20] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#E6B84C]">
-            <span>&#9818;</span> Official Android Release &bull; v1.1.0
+            <span>&#9818;</span> Official Android Release &bull; v1.2.0
           </p>
 
           <h1 className="mt-4 text-4xl font-bold leading-tight tracking-tight text-[#F7F1E3] sm:text-5xl">
@@ -23,8 +23,9 @@ export function LandingPage() {
           <p className="mt-5 max-w-xl text-base leading-relaxed text-[#9CA3AF]">
             ChoiceCLASH is exclusively playable on Android in our{' '}
             <strong className="text-[#F7F1E3]">Royal Emerald &amp; Ivory</strong>{' '}
-            edition. Download the release-signed app for live online matches,
-            AI Coach, Blitz &amp; Rapid clocks, sound effects, tactical puzzles,
+            edition. Download the release-signed app for the 12-stage{' '}
+            <strong className="text-[#F7F1E3]">Royal Odyssey Adventure Map</strong>,
+            live online matches, AI Coach, Blitz &amp; Rapid clocks, tactical puzzles,
             and switchable 2D &amp; 3D boards.
           </p>
 
@@ -173,7 +174,7 @@ export function LandingPage() {
             <span className="rounded bg-[#E6B84C]/15 px-2.5 py-0.5 text-xs font-bold text-[#E6B84C]">
               Quick Android Install Guide
             </span>
-            <span className="text-xs text-[#9CA3AF]">v1.1.0 &bull; Release Build</span>
+            <span className="text-xs text-[#9CA3AF]">v1.2.0 &bull; Release Build</span>
           </div>
           <h2 className="text-xl font-bold text-[#F7F1E3]">
             Install ChoiceCLASH on Your Phone in 3 Steps
@@ -192,7 +193,7 @@ export function LandingPage() {
                 <CheckCircle2 className="h-3.5 w-3.5" />
                 3. Play 2D &amp; 3D
               </p>
-              <p className="mt-1">Launch ChoiceCLASH for AI Coach, Blitz/Rapid clocks, Puzzles &amp; Online rooms.</p>
+              <p className="mt-1">Launch ChoiceCLASH for the Royal Odyssey Map, AI Coach, Puzzles &amp; Online rooms.</p>
             </div>
           </div>
         </div>
@@ -215,14 +216,14 @@ export function LandingPage() {
 
         <div className="rounded border border-[#2A313F] bg-[#151921] p-5">
           <p className="text-xs font-semibold uppercase tracking-wider text-[#E6B84C]">
-            02 / AI Coach &amp; Clocks
+            02 / Royal Odyssey Map
           </p>
           <h3 className="mt-2 text-base font-bold text-[#F7F1E3]">
-            Built-In Chess AI
+            12-Stage Adventure Campaign
           </h3>
           <p className="mt-1.5 text-sm leading-relaxed text-[#9CA3AF]">
-            Play 4 AI tiers with Blitz (3+2) or Rapid (10+0) clocks, live
-            Evaluation Bar, captured pieces, and Post-Game AI Review.
+            Travel across 4 realms and unlock new locations, timed blitz
+            ambushes, realm bosses &amp; 3-star mastery every time you win.
           </p>
         </div>
 
