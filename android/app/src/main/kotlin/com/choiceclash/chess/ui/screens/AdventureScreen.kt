@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,14 +20,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -34,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,7 +50,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.choiceclash.chess.audio.ChessSoundEffects
 import com.choiceclash.chess.chess.AdventureNode
-import com.choiceclash.chess.chess.AdventureNodeType
 import com.choiceclash.chess.chess.AdventureProgress
 import com.choiceclash.chess.chess.AdventureRepository
 import com.choiceclash.chess.chess.AiDifficulty
@@ -58,10 +57,18 @@ import com.choiceclash.chess.chess.ChessAiEngine
 import com.choiceclash.chess.chess.ChessBoard
 import com.choiceclash.chess.chess.PieceColor
 import com.choiceclash.chess.chess.PositionEvaluation
+import com.choiceclash.chess.chess.RpgCameraPreset
+import com.choiceclash.chess.chess.RpgHeroProfile
+import com.choiceclash.chess.chess.RpgRealmEnvironment
+import com.choiceclash.chess.chess.RpgRelic
+import com.choiceclash.chess.chess.RpgRepository
 import com.choiceclash.chess.ui.components.CapturedPiecesBar
 import com.choiceclash.chess.ui.components.ChessboardView
 import com.choiceclash.chess.ui.components.EvalBarView
 import com.choiceclash.chess.ui.components.MoveHistoryStrip
+import com.choiceclash.chess.ui.components.RpgBossAndHeroHud
+import com.choiceclash.chess.ui.components.RpgCameraAndRealmBar
+import com.choiceclash.chess.ui.components.RpgRelicActionBar
 import com.choiceclash.chess.ui.components.formatClockSeconds
 import com.choiceclash.chess.ui.theme.BrushedGold
 import com.choiceclash.chess.ui.theme.CrimsonAlert
@@ -81,17 +88,21 @@ import kotlinx.coroutines.withContext
 fun AdventureScreen() {
     val context = LocalContext.current
     var progress by remember { mutableStateOf(AdventureRepository.loadProgress(context)) }
+    var heroProfile by remember { mutableStateOf(RpgRepository.loadProfile(context)) }
     var activeNode by remember { mutableStateOf<AdventureNode?>(null) }
 
     val node = activeNode
     if (node == null) {
         AdventureWorldMap(
             progress = progress,
+            heroProfile = heroProfile,
             onSelectNode = { selected -> activeNode = selected }
         )
     } else {
         AdventureStageBattle(
             node = node,
+            heroProfile = heroProfile,
+            onHeroProfileUpdated = { heroProfile = it },
             onBackToMap = { activeNode = null },
             onVictoryRecorded = { newProgress ->
                 progress = newProgress
@@ -106,6 +117,7 @@ fun AdventureScreen() {
 @Composable
 private fun AdventureWorldMap(
     progress: AdventureProgress,
+    heroProfile: RpgHeroProfile,
     onSelectNode: (AdventureNode) -> Unit
 ) {
     val playerTitle = remember(progress) { AdventureRepository.currentPlayerTitle(progress) }
@@ -119,7 +131,7 @@ private fun AdventureWorldMap(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        // Odyssey Banner
+        // RPG Hero Odyssey Banner
         Surface(
             shape = RoundedCornerShape(18.dp),
             color = Color.Transparent,
@@ -135,7 +147,7 @@ private fun AdventureWorldMap(
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -144,10 +156,10 @@ private fun AdventureWorldMap(
                 ) {
                     Column {
                         Text(
-                            text = "ROYAL ODYSSEY MAP",
-                            fontSize = 11.sp,
+                            text = "3D RPG ODYSSEY • LV.${heroProfile.level} ${heroProfile.heroTitle.uppercase()}",
+                            fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.2.sp,
+                            letterSpacing = 1.1.sp,
                             color = BrushedGold
                         )
                         Text(
@@ -157,25 +169,70 @@ private fun AdventureWorldMap(
                             color = WarmIvory
                         )
                     }
-                    Surface(
-                        color = BrushedGold.copy(alpha = 0.16f),
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.border(1.dp, BrushedGold.copy(alpha = 0.5f), RoundedCornerShape(10.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Surface(
+                            color = EmeraldVoid.copy(alpha = 0.7f),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.border(1.dp, EmeraldBorder, RoundedCornerShape(10.dp))
+                        ) {
+                            Text(
+                                text = "🪙 ${heroProfile.gold}",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = BrushedGold,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
+                            )
+                        }
+                        Surface(
+                            color = BrushedGold.copy(alpha = 0.16f),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.border(1.dp, BrushedGold.copy(alpha = 0.5f), RoundedCornerShape(10.dp))
+                        ) {
+                            Text(
+                                text = "★ ${progress.totalStars}/${AdventureRepository.nodes.size * 3}",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = BrushedGold,
+                                modifier = Modifier.padding(horizontal = 9.dp, vertical = 6.dp)
+                            )
+                        }
+                    }
+                }
+
+                // XP Progress Bar
+                Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "★ ${progress.totalStars} / ${AdventureRepository.nodes.size * 3}",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = BrushedGold,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                            text = "Commander XP: ${heroProfile.xpInLevel} / ${heroProfile.xpForNextLevel}",
+                            fontSize = 11.sp,
+                            color = MutedSage
+                        )
+                        Text(
+                            text = "Stage ${progress.unlockedLevel} of ${AdventureRepository.nodes.size}",
+                            fontSize = 11.sp,
+                            color = BrushedGold
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp))
+                            .background(EmeraldVoid)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(
+                                    (heroProfile.xpInLevel.toFloat() / heroProfile.xpForNextLevel).coerceIn(0.05f, 1f)
+                                )
+                                .fillMaxHeight()
+                                .background(BrushedGold)
                         )
                     }
                 }
-                Text(
-                    text = "Every victory moves your King to the next realm location. Stage ${progress.unlockedLevel} of ${AdventureRepository.nodes.size} unlocked.",
-                    fontSize = 12.sp,
-                    color = MutedSage
-                )
             }
         }
 
@@ -183,11 +240,13 @@ private fun AdventureWorldMap(
         realms.forEach { (realmNum, realmNodes) ->
             val realmName = realmNodes.firstOrNull()?.realmName.orEmpty()
             val realmUnlocked = realmNodes.any { it.id <= progress.unlockedLevel }
+            val env = RpgRealmEnvironment.forRealm(realmNum)
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = "REALM $realmNum • ${realmName.uppercase()}",
@@ -196,6 +255,11 @@ private fun AdventureWorldMap(
                         letterSpacing = 1.2.sp,
                         color = if (realmUnlocked) BrushedGold else MutedSage
                     )
+                    Text(
+                        text = env.badge,
+                        fontSize = 11.sp,
+                        color = MutedSage
+                    )
                 }
 
                 realmNodes.forEachIndexed { index, node ->
@@ -203,7 +267,6 @@ private fun AdventureWorldMap(
                     val stars = progress.starsByLevel[node.id] ?: 0
                     val isFrontier = node.id == progress.unlockedLevel
 
-                    // Stagger alignment along the trail (left / center / right)
                     val horizontalBias = when (node.id % 4) {
                         1 -> Alignment.Start
                         2 -> Alignment.CenterHorizontally
@@ -364,7 +427,7 @@ private fun AdventureNodeCard(
                         }
                     }
                     Text(
-                        text = if (stars > 0) "Replay" else "Battle",
+                        text = if (stars > 0) "Replay 3D" else "Battle 3D",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
                         color = BrushedGold
@@ -378,6 +441,8 @@ private fun AdventureNodeCard(
 @Composable
 private fun AdventureStageBattle(
     node: AdventureNode,
+    heroProfile: RpgHeroProfile,
+    onHeroProfileUpdated: (RpgHeroProfile) -> Unit,
     onBackToMap: () -> Unit,
     onVictoryRecorded: (AdventureProgress) -> Unit,
     onNextNode: (Int) -> Unit
@@ -385,14 +450,20 @@ private fun AdventureStageBattle(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    var board by remember(node.id) { mutableStateOf(ChessBoard.fromFen(node.startFen)) }
+    val startBoard = remember(node.id) { ChessBoard.fromFen(node.startFen) }
+    var board by remember(node.id) { mutableStateOf(startBoard) }
+    var boardStack by remember(node.id) { mutableStateOf(listOf(startBoard)) }
     var historySan by remember(node.id) { mutableStateOf<List<String>>(emptyList()) }
     var lastMoveFrom by remember(node.id) { mutableStateOf<String?>(null) }
     var lastMoveTo by remember(node.id) { mutableStateOf<String?>(null) }
     var hintFrom by remember(node.id) { mutableStateOf<String?>(null) }
     var hintTo by remember(node.id) { mutableStateOf<String?>(null) }
     var hintText by remember(node.id) { mutableStateOf<String?>(null) }
-    var is3dMode by remember { mutableStateOf(false) }
+
+    var cameraPreset by remember { mutableStateOf(RpgCameraPreset.ISOMETRIC_RPG) }
+    var yawOffset by remember { mutableFloatStateOf(0f) }
+    val realmEnvironment = remember(node.realmNumber) { RpgRealmEnvironment.forRealm(node.realmNumber) }
+
     var aiThinking by remember(node.id) { mutableStateOf(false) }
     var remainingSec by remember(node.id) { mutableIntStateOf(node.timeLimitSec) }
     var timedOut by remember(node.id) { mutableStateOf(false) }
@@ -400,11 +471,22 @@ private fun AdventureStageBattle(
     var victoryHandled by remember(node.id) { mutableStateOf(false) }
     var evaluation by remember { mutableStateOf(PositionEvaluation(0, "0.0", 0.5f)) }
 
+    var usedRelics by remember(node.id) { mutableStateOf(emptySet<RpgRelic>()) }
+    var bossDialogue by remember(node.id) {
+        mutableStateOf("${node.guardianName}: \"Welcome to ${node.title}. Prepare your army!\"")
+    }
+    var combatBanner by remember(node.id) { mutableStateOf<String?>(null) }
+
+    val heroHp = remember(board) { RpgRepository.calculateArmyHp(board, PieceColor.WHITE) }
+    val bossHp = remember(board) { RpgRepository.calculateArmyHp(board, PieceColor.BLACK) }
+
     val playerWon = board.isCheckmate() && board.turn == PieceColor.BLACK
     val isGameOver = timedOut || board.isGameOver()
 
     fun restartStage() {
-        board = ChessBoard.fromFen(node.startFen)
+        val fresh = ChessBoard.fromFen(node.startFen)
+        board = fresh
+        boardStack = listOf(fresh)
         historySan = emptyList()
         lastMoveFrom = null
         lastMoveTo = null
@@ -416,9 +498,12 @@ private fun AdventureStageBattle(
         timedOut = false
         earnedStars = 0
         victoryHandled = false
+        usedRelics = emptySet()
+        combatBanner = null
+        bossDialogue = "${node.guardianName}: \"Let us clash again at ${node.title}!\""
     }
 
-    // Record victory and unlock next place on map
+    // Record victory and unlock next place on map + award RPG XP & Gold
     LaunchedEffect(playerWon) {
         if (playerWon && !victoryHandled) {
             victoryHandled = true
@@ -429,6 +514,12 @@ private fun AdventureStageBattle(
             )
             earnedStars = stars
             onVictoryRecorded(updated)
+            val updatedHero = RpgRepository.awardRewards(
+                context = context,
+                xpGain = 110 + stars * 30,
+                goldGain = 35 + stars * 15
+            )
+            onHeroProfileUpdated(updatedHero)
             ChessSoundEffects.playGameOver()
         }
     }
@@ -459,19 +550,22 @@ private fun AdventureStageBattle(
     LaunchedEffect(board, isGameOver) {
         if (!isGameOver && board.turn == PieceColor.BLACK) {
             aiThinking = true
-            delay(220)
+            delay(240)
             val result = withContext(Dispatchers.Default) {
                 ChessAiEngine.getBestMove(board, node.difficulty, node.personality)
             }
             if (result != null) {
                 val nextBoard = board.applyMoveUnchecked(result.move)
                 board = nextBoard
+                boardStack = boardStack + nextBoard
                 historySan = historySan + result.san
                 lastMoveFrom = result.move.fromSquare
                 lastMoveTo = result.move.toSquare
                 hintFrom = null
                 hintTo = null
                 hintText = null
+                combatBanner = RpgRepository.combatPopupForMove(result.move, nextBoard)
+                bossDialogue = RpgRepository.bossDialogue(node.guardianName, result.move, nextBoard)
                 when {
                     nextBoard.isGameOver() -> ChessSoundEffects.playGameOver()
                     nextBoard.inCheck() -> ChessSoundEffects.playCheck()
@@ -489,7 +583,7 @@ private fun AdventureStageBattle(
             .background(EmeraldVoid)
             .verticalScroll(rememberScrollState())
             .padding(14.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        verticalArrangement = Arrangement.spacedBy(9.dp)
     ) {
         // Header bar
         Row(
@@ -503,7 +597,7 @@ private fun AdventureStageBattle(
             ) {
                 OutlinedButton(onClick = onBackToMap) {
                     Icon(
-                        imageVector = Icons.Rounded.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                         contentDescription = "Back to Map",
                         tint = WarmIvory,
                         modifier = Modifier.size(16.dp)
@@ -514,47 +608,54 @@ private fun AdventureStageBattle(
                 Column {
                     Text(
                         text = "Stage ${node.id}: ${node.title}",
-                        fontSize = 16.sp,
+                        fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
                         color = WarmIvory
                     )
                     Text(
-                        text = "vs ${node.guardianName} • ${node.difficulty.label}",
+                        text = "${realmEnvironment.badge} • ${node.difficulty.label}",
                         fontSize = 11.sp,
                         color = BrushedGold
                     )
                 }
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                if (node.timeLimitSec > 0) {
-                    Surface(
-                        color = EmeraldSurface,
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = Modifier.border(1.dp, EmeraldBorder, RoundedCornerShape(8.dp))
-                    ) {
-                        Text(
-                            text = formatClockSeconds(remainingSec),
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (remainingSec <= 20) CrimsonAlert else BrushedGold,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
-                    }
-                }
-                FilterChip(
-                    selected = is3dMode,
-                    onClick = { is3dMode = !is3dMode },
-                    label = { Text(if (is3dMode) "3D" else "2D", fontSize = 11.sp, fontWeight = FontWeight.Bold) },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = BrushedGold,
-                        selectedLabelColor = Color(0xFF0B1F17),
-                        containerColor = EmeraldSurface,
-                        labelColor = BrushedGold
+            if (node.timeLimitSec > 0) {
+                Surface(
+                    color = EmeraldSurface,
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.border(1.dp, EmeraldBorder, RoundedCornerShape(8.dp))
+                ) {
+                    Text(
+                        text = formatClockSeconds(remainingSec),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (remainingSec <= 20) CrimsonAlert else BrushedGold,
+                        modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp)
                     )
-                )
+                }
             }
         }
+
+        // RPG Boss & Hero HP Bar + Dialogue
+        RpgBossAndHeroHud(
+            heroProfile = heroProfile,
+            heroHp = heroHp,
+            bossName = node.guardianName,
+            bossTitle = node.nodeType.badge,
+            bossHp = bossHp,
+            dialogue = bossDialogue,
+            combatBanner = combatBanner
+        )
+
+        // 3D Camera Orbit & Perspective Bar
+        RpgCameraAndRealmBar(
+            cameraPreset = cameraPreset,
+            onSelectCamera = { cameraPreset = it },
+            yawOffset = yawOffset,
+            onRotateYaw = { yawOffset = it },
+            realm = realmEnvironment
+        )
 
         EvalBarView(evaluation = evaluation)
         CapturedPiecesBar(board = board)
@@ -562,7 +663,9 @@ private fun AdventureStageBattle(
         ChessboardView(
             board = board,
             flipped = false,
-            is3dMode = is3dMode,
+            cameraPreset = cameraPreset,
+            yawOffset = yawOffset,
+            realmEnvironment = realmEnvironment,
             interactive = !isGameOver && !aiThinking && board.turn == PieceColor.WHITE,
             allowedColor = PieceColor.WHITE,
             lastMoveFrom = lastMoveFrom,
@@ -571,15 +674,73 @@ private fun AdventureStageBattle(
             hintTo = hintTo,
             onMoveSelected = { move ->
                 val san = board.toSan(move)
-                board = board.applyMoveUnchecked(move)
+                val nextBoard = board.applyMoveUnchecked(move)
+                board = nextBoard
+                boardStack = boardStack + nextBoard
                 historySan = historySan + san
                 lastMoveFrom = move.fromSquare
                 lastMoveTo = move.toSquare
                 hintFrom = null
                 hintTo = null
                 hintText = null
+                combatBanner = RpgRepository.combatPopupForMove(move, nextBoard)
+                bossDialogue = RpgRepository.bossDialogue(node.guardianName, move, nextBoard)
+                if (move.captured != null) {
+                    val updatedHero = RpgRepository.awardRewards(
+                        context = context,
+                        xpGain = 15,
+                        goldGain = 5
+                    )
+                    onHeroProfileUpdated(updatedHero)
+                }
             }
         )
+
+        // Active RPG Relics Bar
+        if (!isGameOver) {
+            RpgRelicActionBar(
+                usedRelics = usedRelics,
+                showChronos = node.timeLimitSec > 0,
+                onActivateRelic = { relic ->
+                    when (relic) {
+                        RpgRelic.ORACLE_SIGHT -> {
+                            if (!aiThinking && board.turn == PieceColor.WHITE) {
+                                usedRelics = usedRelics + relic
+                                scope.launch {
+                                    val hint = withContext(Dispatchers.Default) {
+                                        ChessAiEngine.getBestMove(board, AiDifficulty.MASTER, node.personality)
+                                    }
+                                    if (hint != null) {
+                                        hintFrom = hint.move.fromSquare
+                                        hintTo = hint.move.toSquare
+                                        hintText = "🔮 Oracle's Sight: ${hint.san} — ${hint.explanation}"
+                                    }
+                                }
+                            }
+                        }
+                        RpgRelic.CHRONOS_SANDS -> {
+                            if (node.timeLimitSec > 0) {
+                                usedRelics = usedRelics + relic
+                                remainingSec += 45
+                                combatBanner = "⏳ CHRONOS SANDS ACTIVATED! +45s CLOCK BONUS"
+                            }
+                        }
+                        RpgRelic.AEGIS_REWIND -> {
+                            if (!aiThinking && boardStack.size >= 3) {
+                                usedRelics = usedRelics + relic
+                                val newStack = boardStack.dropLast(2)
+                                boardStack = newStack
+                                board = newStack.last()
+                                historySan = historySan.dropLast(2)
+                                lastMoveFrom = null
+                                lastMoveTo = null
+                                combatBanner = "🛡️ AEGIS REWIND! TIME REVERSED 1 TURN"
+                            }
+                        }
+                    }
+                }
+            )
+        }
 
         MoveHistoryStrip(historySan = historySan)
 
@@ -615,7 +776,7 @@ private fun AdventureStageBattle(
                 ) {
                     Text(
                         text = when {
-                            playerWon -> "Victory! ${"★".repeat(earnedStars)} (${earnedStars}/3 Stars)"
+                            playerWon -> "Victory! ${"★".repeat(earnedStars)} (${earnedStars}/3 Stars) • +${110 + earnedStars * 30} XP"
                             timedOut -> "Time's Up! ${node.guardianName} holds ${node.title}."
                             board.isCheckmate() -> "Defeat — ${node.guardianName} wins this battle."
                             else -> "Draw — You must win to advance on the map!"
@@ -666,37 +827,6 @@ private fun AdventureStageBattle(
                             }
                         }
                     }
-                }
-            }
-        } else {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedButton(
-                    onClick = {
-                        if (!aiThinking && board.turn == PieceColor.WHITE) {
-                            scope.launch {
-                                val hint = withContext(Dispatchers.Default) {
-                                    ChessAiEngine.getBestMove(board, AiDifficulty.MASTER, node.personality)
-                                }
-                                if (hint != null) {
-                                    hintFrom = hint.move.fromSquare
-                                    hintTo = hint.move.toSquare
-                                    hintText = "Smart Hint: ${hint.san} — ${hint.explanation}"
-                                }
-                            }
-                        }
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Hint", color = BrushedGold, fontSize = 12.sp)
-                }
-                OutlinedButton(
-                    onClick = { restartStage() },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Restart", color = WarmIvory, fontSize = 12.sp)
                 }
             }
         }

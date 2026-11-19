@@ -12,7 +12,7 @@ export function LandingPage() {
       <div className="grid items-center gap-12 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <p className="inline-flex items-center gap-2 rounded border border-[#E6B84C]/40 bg-[#112B20] px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#E6B84C]">
-            <span>&#9818;</span> Official Android Release &bull; v1.3.1
+            <span>&#9818;</span> Official Android Release &bull; v1.4.0 (3D RPG Edition)
           </p>
 
           <h1 className="mt-4 text-4xl font-bold leading-tight tracking-tight text-[#F7F1E3] sm:text-5xl">
@@ -174,7 +174,7 @@ export function LandingPage() {
             <span className="rounded bg-[#E6B84C]/15 px-2.5 py-0.5 text-xs font-bold text-[#E6B84C]">
               Quick Android Install Guide
             </span>
-            <span className="text-xs text-[#9CA3AF]">v1.3.1 &bull; Release Build</span>
+            <span className="text-xs text-[#9CA3AF]">v1.4.0 &bull; 3D RPG Release Build</span>
           </div>
           <h2 className="text-xl font-bold text-[#F7F1E3]">
             Install ChoiceCLASH on Your Phone in 3 Steps

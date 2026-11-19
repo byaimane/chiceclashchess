@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,11 +49,16 @@ import com.choiceclash.chess.chess.OpeningsBook
 import com.choiceclash.chess.chess.PieceColor
 import com.choiceclash.chess.chess.PositionEvaluation
 import com.choiceclash.chess.chess.PuzzlesRepository
+import com.choiceclash.chess.chess.RpgCameraPreset
+import com.choiceclash.chess.chess.RpgRealmEnvironment
+import com.choiceclash.chess.chess.RpgRepository
 import com.choiceclash.chess.ui.components.AiReviewDialog
 import com.choiceclash.chess.ui.components.CapturedPiecesBar
 import com.choiceclash.chess.ui.components.ChessboardView
 import com.choiceclash.chess.ui.components.EvalBarView
 import com.choiceclash.chess.ui.components.MoveHistoryStrip
+import com.choiceclash.chess.ui.components.RpgBossAndHeroHud
+import com.choiceclash.chess.ui.components.RpgCameraAndRealmBar
 import com.choiceclash.chess.ui.components.formatClockSeconds
 import com.choiceclash.chess.ui.theme.BrushedGold
 import com.choiceclash.chess.ui.theme.EmeraldBorder
@@ -80,7 +86,11 @@ fun AiArenaScreen() {
     var difficulty by remember { mutableStateOf(AiDifficulty.CLUB) }
     var personality by remember { mutableStateOf(AiPersonality.BALANCED) }
     var playerColor by remember { mutableStateOf(PieceColor.WHITE) }
-    var is3dMode by remember { mutableStateOf(false) }
+    var cameraPreset by remember { mutableStateOf(RpgCameraPreset.ISOMETRIC_RPG) }
+    var yawOffset by remember { mutableFloatStateOf(0f) }
+    var realmEnvironment by remember { mutableStateOf(RpgRealmEnvironment.EMERALD_COURTYARD) }
+    var heroProfile by remember { mutableStateOf(RpgRepository.loadProfile(context)) }
+    var combatBanner by remember { mutableStateOf<String?>(null) }
     var soundEnabled by remember { mutableStateOf(ChessSoundEffects.enabled) }
     var timeControl by remember { mutableStateOf(TimeControl.UNTIMED) }
     var whiteTimeSec by remember { mutableIntStateOf(0) }
@@ -268,9 +278,11 @@ fun AiArenaScreen() {
                     )
                 )
                 FilterChip(
-                    selected = is3dMode,
-                    onClick = { is3dMode = !is3dMode },
-                    label = { Text(if (is3dMode) "3D" else "2D", fontSize = 11.sp, fontWeight = FontWeight.Bold) },
+                    selected = cameraPreset.is3d,
+                    onClick = {
+                        cameraPreset = if (cameraPreset.is3d) RpgCameraPreset.TACTICAL_2D else RpgCameraPreset.ISOMETRIC_RPG
+                    },
+                    label = { Text(if (cameraPreset.is3d) "3D RPG" else "2D", fontSize = 11.sp, fontWeight = FontWeight.Bold) },
                     colors = FilterChipDefaults.filterChipColors(
                         selectedContainerColor = BrushedGold,
                         selectedLabelColor = Color(0xFF0B1F17),
@@ -378,6 +390,30 @@ fun AiArenaScreen() {
             }
         }
 
+        // 3D RPG Camera & Realm Selector + Hero/Boss HP HUD
+        RpgCameraAndRealmBar(
+            cameraPreset = cameraPreset,
+            onSelectCamera = { cameraPreset = it },
+            yawOffset = yawOffset,
+            onRotateYaw = { yawOffset = it },
+            realm = realmEnvironment,
+            onSelectRealm = { realmEnvironment = it }
+        )
+
+        if (cameraPreset.is3d) {
+            val heroHp = remember(board, playerColor) { RpgRepository.calculateArmyHp(board, playerColor) }
+            val bossHp = remember(board, playerColor) { RpgRepository.calculateArmyHp(board, playerColor.opposite()) }
+            RpgBossAndHeroHud(
+                heroProfile = heroProfile,
+                heroHp = heroHp,
+                bossName = "${difficulty.label} AI",
+                bossTitle = personality.label,
+                bossHp = bossHp,
+                dialogue = "3D RPG Arena • ${realmEnvironment.title}",
+                combatBanner = combatBanner
+            )
+        }
+
         // Live Eval Bar + Captured Pieces
         EvalBarView(evaluation = evaluation)
         CapturedPiecesBar(board = board)
@@ -404,7 +440,9 @@ fun AiArenaScreen() {
         ChessboardView(
             board = board,
             flipped = playerColor == PieceColor.BLACK,
-            is3dMode = is3dMode,
+            cameraPreset = cameraPreset,
+            yawOffset = yawOffset,
+            realmEnvironment = realmEnvironment,
             interactive = !isGameOver && !aiThinking && board.turn == playerColor,
             allowedColor = playerColor,
             lastMoveFrom = lastMoveFrom,
@@ -422,6 +460,10 @@ fun AiArenaScreen() {
                 hintFrom = null
                 hintTo = null
                 hintText = null
+                combatBanner = RpgRepository.combatPopupForMove(move, nextBoard)
+                if (move.captured != null) {
+                    heroProfile = RpgRepository.awardRewards(context, xpGain = 15, goldGain = 5)
+                }
                 if (timeControl != TimeControl.UNTIMED && timeControl.incrementSec > 0) {
                     if (playerColor == PieceColor.WHITE) whiteTimeSec += timeControl.incrementSec
                     else blackTimeSec += timeControl.incrementSec

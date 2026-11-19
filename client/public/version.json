@@ -1,6 +1,6 @@
 {
-  "versionCode": 6,
-  "versionName": "1.3.1",
+  "versionCode": 7,
+  "versionName": "1.4.0",
   "apkUrl": "https://choiceclash.vercel.app/downloads/ChoiceCLASH.apk",
-  "releaseNotes": "v1.3.1: Targets Android API level 36, Live Admin Panel Sync, In-App Update Checker, and 12-Stage Royal Odyssey Adventure Map."
+  "releaseNotes": "v1.4.0: 3D RPG Chess Arena (4 Realm Particle Battlegrounds, 3D Isometric/Warlord Camera Orbit, Sculpted Pedestal Pieces, Boss & Hero HP Bars, Combat VFX & Active RPG Relics)."
 }
