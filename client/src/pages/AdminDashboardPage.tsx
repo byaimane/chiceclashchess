@@ -6,6 +6,7 @@ import {
   Plus,
   RefreshCw,
   Shield,
+  Smartphone,
   Star,
   Trash2,
   Users,
@@ -44,7 +45,7 @@ interface ActiveRoomInfo {
 
 export function AdminDashboardPage() {
   const { user: currentUser } = useAuth();
-  const [tab, setTab] = useState<'users' | 'games' | 'themes' | 'plugins'>('users');
+  const [tab, setTab] = useState<'users' | 'games' | 'themes' | 'plugins' | 'mobile'>('mobile');
   const [overview, setOverview] = useState<AdminOverview | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [games, setGames] = useState<AdminGame[]>([]);
@@ -74,6 +75,21 @@ export function AdminDashboardPage() {
     configJson: '{}',
   });
   const [pluginConfigs, setPluginConfigs] = useState<Record<string, string>>({});
+
+  // Mobile App Control live config state
+  const [mobileAnnouncement, setMobileAnnouncement] = useState('');
+  const [mobileVersionCode, setMobileVersionCode] = useState(8);
+  const [mobileVersionName, setMobileVersionName] = useState('1.5.0');
+  const [mobileApkUrl, setMobileApkUrl] = useState('https://choiceclash.vercel.app/downloads/ChoiceCLASH.apk');
+  const [mobileReleaseNotes, setMobileReleaseNotes] = useState('');
+  const [mobilePuzzleTitle, setMobilePuzzleTitle] = useState('');
+  const [mobilePuzzleTheme, setMobilePuzzleTheme] = useState('Tactical Strike');
+  const [mobilePuzzleDifficulty, setMobilePuzzleDifficulty] = useState('Intermediate');
+  const [mobilePuzzleFen, setMobilePuzzleFen] = useState('6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1');
+  const [mobilePuzzleSan, setMobilePuzzleSan] = useState('Ra8#');
+  const [mobilePuzzleHint, setMobilePuzzleHint] = useState('Check the 8th rank back-rank weakness.');
+  const [mobilePuzzleExplanation, setMobilePuzzleExplanation] = useState('Ra8# delivers checkmate on the back rank.');
+  const [mobileStatusMsg, setMobileStatusMsg] = useState('');
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editStats, setEditStats] = useState({
@@ -105,6 +121,28 @@ export function AdminDashboardPage() {
       setPluginConfigs(
         Object.fromEntries(pl.plugins.map((item) => [item.id, item.configJson || '{}']))
       );
+      const mobilePlugin = pl.plugins.find((item) => item.slug === 'mobile-remote-config');
+      if (mobilePlugin?.configJson) {
+        try {
+          const parsed = JSON.parse(mobilePlugin.configJson);
+          if (typeof parsed.announcement === 'string') setMobileAnnouncement(parsed.announcement);
+          if (typeof parsed.versionCode === 'number') setMobileVersionCode(parsed.versionCode);
+          if (typeof parsed.versionName === 'string') setMobileVersionName(parsed.versionName);
+          if (typeof parsed.apkUrl === 'string') setMobileApkUrl(parsed.apkUrl);
+          if (typeof parsed.releaseNotes === 'string') setMobileReleaseNotes(parsed.releaseNotes);
+          if (parsed.customPuzzle) {
+            setMobilePuzzleTitle(parsed.customPuzzle.title || '');
+            setMobilePuzzleTheme(parsed.customPuzzle.theme || 'Tactical Strike');
+            setMobilePuzzleDifficulty(parsed.customPuzzle.difficulty || 'Intermediate');
+            setMobilePuzzleFen(parsed.customPuzzle.fen || '6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1');
+            setMobilePuzzleSan(parsed.customPuzzle.solutionSan || 'Ra8#');
+            setMobilePuzzleHint(parsed.customPuzzle.hint || '');
+            setMobilePuzzleExplanation(parsed.customPuzzle.explanation || '');
+          }
+        } catch {
+          // ignore malformed configJson
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load admin data.');
     } finally {
@@ -253,6 +291,17 @@ export function AdminDashboardPage() {
 
       {/* Tabs */}
       <div className="mt-8 flex flex-wrap gap-2 border-b border-[#2A313F]">
+        <button
+          onClick={() => setTab('mobile')}
+          className={`inline-flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition ${
+            tab === 'mobile'
+              ? 'border-[#D4AF37] text-[#D4AF37]'
+              : 'border-transparent text-[#9CA3AF] hover:text-[#F5F0E6]'
+          }`}
+        >
+          <Smartphone className="h-4 w-4" />
+          Mobile App Control
+        </button>
         <button
           onClick={() => setTab('users')}
           className={`inline-flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-semibold transition ${
@@ -969,6 +1018,257 @@ export function AdminDashboardPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {tab === 'mobile' && (
+        <div className="mt-6 space-y-6">
+          <div className="rounded border border-[#2E5D47] bg-[#112B20]/70 p-6">
+            <h2 className="text-lg font-bold text-[#F5F0E6]">
+              1-Click Android App Remote Control
+            </h2>
+            <p className="mt-1 text-xs text-[#9CA3AF]">
+              Everything saved here is published to <code>/api/config/plugins</code> (
+              <code>mobile-remote-config</code>) and syncs directly to every ChoiceCLASH
+              Android phone without requiring a new Play Store upload.
+            </p>
+
+            {mobileStatusMsg && (
+              <div className="mt-4 rounded border border-[#4ADE80]/40 bg-[#4ADE80]/10 px-4 py-2.5 text-xs font-semibold text-[#4ADE80]">
+                {mobileStatusMsg}
+              </div>
+            )}
+
+            <div className="mt-6 grid gap-6 lg:grid-cols-2">
+              {/* Live Announcement Banner + Update Notification */}
+              <div className="space-y-4 rounded border border-[#2A313F] bg-[#151921] p-4">
+                <h3 className="text-sm font-bold text-[#D4AF37]">
+                  Live Home Screen Announcement Banner
+                </h3>
+                <div>
+                  <label className="block text-xs font-semibold text-[#9CA3AF]">
+                    Announcement Text (Leave blank to hide banner)
+                  </label>
+                  <input
+                    type="text"
+                    value={mobileAnnouncement}
+                    onChange={(e) => setMobileAnnouncement(e.target.value)}
+                    placeholder="e.g. Weekend 3D RPG Tournament Live! Win 2x Gold!"
+                    className="mt-1 w-full rounded border border-[#2A313F] bg-[#0D0F12] px-3 py-2 text-sm text-[#F5F0E6]"
+                  />
+                </div>
+
+                <h3 className="pt-2 text-sm font-bold text-[#D4AF37]">
+                  In-App Update Notification Override
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#9CA3AF]">
+                      Latest Version Code
+                    </label>
+                    <input
+                      type="number"
+                      value={mobileVersionCode}
+                      onChange={(e) => setMobileVersionCode(Number(e.target.value) || 8)}
+                      className="mt-1 w-full rounded border border-[#2A313F] bg-[#0D0F12] px-3 py-2 text-sm text-[#F5F0E6]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#9CA3AF]">
+                      Version Name
+                    </label>
+                    <input
+                      type="text"
+                      value={mobileVersionName}
+                      onChange={(e) => setMobileVersionName(e.target.value)}
+                      className="mt-1 w-full rounded border border-[#2A313F] bg-[#0D0F12] px-3 py-2 text-sm text-[#F5F0E6]"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#9CA3AF]">
+                    APK Download URL
+                  </label>
+                  <input
+                    type="text"
+                    value={mobileApkUrl}
+                    onChange={(e) => setMobileApkUrl(e.target.value)}
+                    className="mt-1 w-full rounded border border-[#2A313F] bg-[#0D0F12] px-3 py-2 text-xs text-[#F5F0E6]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#9CA3AF]">
+                    Release Notes Shown in Update Dialog
+                  </label>
+                  <input
+                    type="text"
+                    value={mobileReleaseNotes}
+                    onChange={(e) => setMobileReleaseNotes(e.target.value)}
+                    placeholder="What's new in this update"
+                    className="mt-1 w-full rounded border border-[#2A313F] bg-[#0D0F12] px-3 py-2 text-xs text-[#F5F0E6]"
+                  />
+                </div>
+              </div>
+
+              {/* Push Live Daily Tactical Puzzle */}
+              <div className="space-y-3 rounded border border-[#2A313F] bg-[#151921] p-4">
+                <h3 className="text-sm font-bold text-[#D4AF37]">
+                  Push Live Featured Daily Puzzle to Android App
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#9CA3AF]">
+                      Puzzle Title (Blank = None)
+                    </label>
+                    <input
+                      type="text"
+                      value={mobilePuzzleTitle}
+                      onChange={(e) => setMobilePuzzleTitle(e.target.value)}
+                      placeholder="e.g. Royal Fork Challenge"
+                      className="mt-1 w-full rounded border border-[#2A313F] bg-[#0D0F12] px-3 py-2 text-xs text-[#F5F0E6]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#9CA3AF]">
+                      Theme &amp; Difficulty
+                    </label>
+                    <div className="mt-1 flex gap-1.5">
+                      <input
+                        type="text"
+                        value={mobilePuzzleTheme}
+                        onChange={(e) => setMobilePuzzleTheme(e.target.value)}
+                        placeholder="Theme"
+                        className="w-1/2 rounded border border-[#2A313F] bg-[#0D0F12] px-2 py-2 text-xs text-[#F5F0E6]"
+                      />
+                      <input
+                        type="text"
+                        value={mobilePuzzleDifficulty}
+                        onChange={(e) => setMobilePuzzleDifficulty(e.target.value)}
+                        placeholder="Difficulty"
+                        className="w-1/2 rounded border border-[#2A313F] bg-[#0D0F12] px-2 py-2 text-xs text-[#F5F0E6]"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#9CA3AF]">
+                    Position FEN
+                  </label>
+                  <input
+                    type="text"
+                    value={mobilePuzzleFen}
+                    onChange={(e) => setMobilePuzzleFen(e.target.value)}
+                    className="mt-1 w-full rounded border border-[#2A313F] bg-[#0D0F12] px-3 py-2 font-mono text-xs text-[#F5F0E6]"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#9CA3AF]">
+                      Winning Move (SAN)
+                    </label>
+                    <input
+                      type="text"
+                      value={mobilePuzzleSan}
+                      onChange={(e) => setMobilePuzzleSan(e.target.value)}
+                      placeholder="e.g. Ra8#"
+                      className="mt-1 w-full rounded border border-[#2A313F] bg-[#0D0F12] px-3 py-2 font-mono text-xs text-[#F5F0E6]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#9CA3AF]">
+                      Hint
+                    </label>
+                    <input
+                      type="text"
+                      value={mobilePuzzleHint}
+                      onChange={(e) => setMobilePuzzleHint(e.target.value)}
+                      className="mt-1 w-full rounded border border-[#2A313F] bg-[#0D0F12] px-3 py-2 text-xs text-[#F5F0E6]"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#9CA3AF]">
+                    Solution Explanation
+                  </label>
+                  <input
+                    type="text"
+                    value={mobilePuzzleExplanation}
+                    onChange={(e) => setMobilePuzzleExplanation(e.target.value)}
+                    className="mt-1 w-full rounded border border-[#2A313F] bg-[#0D0F12] px-3 py-2 text-xs text-[#F5F0E6]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={async () => {
+                  setError('');
+                  setMobileStatusMsg('');
+                  try {
+                    const payloadObj: Record<string, unknown> = {
+                      announcement: mobileAnnouncement.trim(),
+                      versionCode: mobileVersionCode,
+                      versionName: mobileVersionName.trim() || '1.5.0',
+                      apkUrl:
+                        mobileApkUrl.trim() ||
+                        'https://choiceclash.vercel.app/downloads/ChoiceCLASH.apk',
+                      releaseNotes: mobileReleaseNotes.trim(),
+                    };
+                    if (mobilePuzzleTitle.trim() && mobilePuzzleFen.trim() && mobilePuzzleSan.trim()) {
+                      payloadObj.customPuzzle = {
+                        id: 'admin-live-puzzle',
+                        title: mobilePuzzleTitle.trim(),
+                        theme: mobilePuzzleTheme.trim() || 'Admin Challenge',
+                        difficulty: mobilePuzzleDifficulty.trim() || 'Featured',
+                        fen: mobilePuzzleFen.trim(),
+                        solutionSan: mobilePuzzleSan.trim(),
+                        hint: mobilePuzzleHint.trim() || 'Find the winning move!',
+                        explanation:
+                          mobilePuzzleExplanation.trim() || 'Featured Admin Tactical Puzzle solved!',
+                      };
+                    }
+                    const configStr = JSON.stringify(payloadObj);
+                    const existing = plugins.find((p) => p.slug === 'mobile-remote-config');
+                    if (existing) {
+                      await apiRequest(`/api/admin/plugins/${existing.id}`, {
+                        method: 'PATCH',
+                        body: JSON.stringify({
+                          enabled: true,
+                          configJson: configStr,
+                        }),
+                      });
+                    } else {
+                      await apiRequest('/api/admin/plugins', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                          name: 'Mobile App Remote Control',
+                          slug: 'mobile-remote-config',
+                          category: 'gameplay',
+                          version: '1.5.0',
+                          description:
+                            'Live Announcement Banner, OTA Update Prompt & Featured Daily Puzzle for Android App',
+                          enabled: true,
+                          configJson: configStr,
+                        }),
+                      });
+                    }
+                    await loadAll();
+                    setMobileStatusMsg('Published live to all Android devices!');
+                  } catch (err) {
+                    setError(
+                      err instanceof Error ? err.message : 'Failed to publish mobile config.'
+                    );
+                  }
+                }}
+                className="inline-flex items-center gap-2 rounded border border-[#B59124] bg-[#D4AF37] px-5 py-2.5 text-sm font-bold text-[#0D0F12] transition hover:bg-[#E5C158]"
+              >
+                <CheckCircle2 className="h-4 w-4" />
+                Publish Live to Android App
+              </button>
+            </div>
           </div>
         </div>
       )}

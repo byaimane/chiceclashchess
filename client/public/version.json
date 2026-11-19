@@ -1,6 +1,6 @@
 {
-  "versionCode": 7,
-  "versionName": "1.4.0",
+  "versionCode": 8,
+  "versionName": "1.5.0",
   "apkUrl": "https://choiceclash.vercel.app/downloads/ChoiceCLASH.apk",
-  "releaseNotes": "v1.4.0: 3D RPG Chess Arena (4 Realm Particle Battlegrounds, 3D Isometric/Warlord Camera Orbit, Sculpted Pedestal Pieces, Boss & Hero HP Bars, Combat VFX & Active RPG Relics)."
+  "releaseNotes": "v1.5.0: 3D RPG Chess Arena, 2P Pass & Play, Global Leaderboard & Achievement Badges, 1-Tap Share Match PGN, Admin Mobile Remote Control & Play Store Privacy Compliance."
 }

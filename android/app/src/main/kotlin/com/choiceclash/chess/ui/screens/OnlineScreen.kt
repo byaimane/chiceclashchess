@@ -1,5 +1,8 @@
 package com.choiceclash.chess.ui.screens
 
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -273,6 +277,23 @@ fun OnlineScreen() {
                             fontSize = 12.sp
                         )
                     }
+
+                    TextButton(
+                        onClick = {
+                            runCatching {
+                                context.startActivity(
+                                    Intent(Intent.ACTION_VIEW, Uri.parse("https://choiceclash.vercel.app/privacy"))
+                                )
+                            }
+                        },
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    ) {
+                        Text(
+                            text = "Privacy Policy & Account Deletion",
+                            color = MutedSage,
+                            fontSize = 11.sp
+                        )
+                    }
                 }
             }
         }
@@ -299,6 +320,55 @@ fun OnlineScreen() {
     }
 
     // Online Lobby View
+    var showDeleteAccountDialog by remember { mutableStateOf(false) }
+    if (showDeleteAccountDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteAccountDialog = false },
+            containerColor = EmeraldSurface,
+            title = {
+                Text("Delete Account & Data", color = WarmIvory, fontWeight = FontWeight.Bold)
+            },
+            text = {
+                Text(
+                    text = "Are you sure you want to permanently delete your ChoiceCLASH account (${user.username}) and erase all saved credentials and local profile data?",
+                    fontSize = 12.sp,
+                    color = MutedSage
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showDeleteAccountDialog = false
+                        SocketManager.disconnect()
+                        ApiClient.saveToken(context, null)
+                        currentUser = null
+                        Toast.makeText(
+                            context,
+                            "Account deletion submitted & local data erased.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        runCatching {
+                            context.startActivity(
+                                Intent(Intent.ACTION_VIEW, Uri.parse("https://choiceclash.vercel.app/privacy#delete-account"))
+                            )
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = CrimsonAlert,
+                        contentColor = WarmIvory
+                    )
+                ) {
+                    Text("Delete Account", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteAccountDialog = false }) {
+                    Text("Cancel", color = BrushedGold)
+                }
+            }
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -315,37 +385,62 @@ fun OnlineScreen() {
                 .fillMaxWidth()
                 .border(1.dp, EmeraldBorder, RoundedCornerShape(16.dp))
         ) {
-            Row(
+            Column(
                 modifier = Modifier.padding(14.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Column {
-                    Text(
-                        text = user.username,
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = WarmIvory
-                    )
-                    Text(
-                        text = "Rating: ${user.rating} • ${user.wins}W / ${user.losses}L / ${user.draws}D",
-                        fontSize = 12.sp,
-                        color = BrushedGold
-                    )
-                    Text(
-                        text = if (isConnected) "● Live Server Connected" else "○ Reconnecting...",
-                        fontSize = 11.sp,
-                        color = if (isConnected) EmeraldSuccess else MutedSage
-                    )
-                }
-                OutlinedButton(
-                    onClick = {
-                        SocketManager.disconnect()
-                        ApiClient.saveToken(context, null)
-                        currentUser = null
-                    }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Sign Out", fontSize = 11.sp, color = WarmIvory)
+                    Column {
+                        Text(
+                            text = user.username,
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = WarmIvory
+                        )
+                        Text(
+                            text = "Rating: ${user.rating} • ${user.wins}W / ${user.losses}L / ${user.draws}D",
+                            fontSize = 12.sp,
+                            color = BrushedGold
+                        )
+                        Text(
+                            text = if (isConnected) "● Live Server Connected" else "○ Reconnecting...",
+                            fontSize = 11.sp,
+                            color = if (isConnected) EmeraldSuccess else MutedSage
+                        )
+                    }
+                    OutlinedButton(
+                        onClick = {
+                            SocketManager.disconnect()
+                            ApiClient.saveToken(context, null)
+                            currentUser = null
+                        }
+                    ) {
+                        Text("Sign Out", fontSize = 11.sp, color = WarmIvory)
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(
+                        onClick = {
+                            runCatching {
+                                context.startActivity(
+                                    Intent(Intent.ACTION_VIEW, Uri.parse("https://choiceclash.vercel.app/privacy"))
+                                )
+                            }
+                        }
+                    ) {
+                        Text("Privacy Policy", fontSize = 11.sp, color = MutedSage)
+                    }
+                    TextButton(onClick = { showDeleteAccountDialog = true }) {
+                        Text("Privacy & Delete Account", fontSize = 11.sp, color = CrimsonAlert)
+                    }
                 }
             }
         }

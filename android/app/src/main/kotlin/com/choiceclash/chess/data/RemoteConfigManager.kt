@@ -2,6 +2,7 @@ package com.choiceclash.chess.data
 
 import android.content.Context
 import androidx.compose.ui.graphics.Color
+import com.choiceclash.chess.chess.TacticalPuzzle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,8 +13,8 @@ import okhttp3.Request
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
-const val CURRENT_VERSION_CODE = 7
-const val CURRENT_VERSION_NAME = "1.4.0"
+const val CURRENT_VERSION_CODE = 8
+const val CURRENT_VERSION_NAME = "1.5.0"
 const val VERCEL_VERSION_URL = "https://choiceclash.vercel.app/version.json"
 
 private const val PREFS_REMOTE = "choiceclash_remote_config"
@@ -41,6 +42,7 @@ data class RemoteAppState(
     val selectedTheme: RemoteBoardTheme? = null,
     val announcement: String? = null,
     val updateInfo: AppUpdateInfo? = null,
+    val customPuzzle: TacticalPuzzle? = null,
     val isSyncing: Boolean = false,
     val lastSyncMessage: String? = null
 )
@@ -63,6 +65,7 @@ object RemoteConfigManager {
         var loadedThemes: List<RemoteBoardTheme> = _state.value.themes
         var announcement: String? = null
         var pluginUpdate: AppUpdateInfo? = null
+        var customPuzzle: TacticalPuzzle? = null
 
         // 1. Fetch active Admin Panel themes
         runCatching {
@@ -128,6 +131,23 @@ object RemoteConfigManager {
                                     releaseNotes = cfg?.optString("releaseNotes", "") ?: ""
                                 )
                             }
+                            val puzObj = cfg?.optJSONObject("customPuzzle")
+                            if (puzObj != null) {
+                                val fen = puzObj.optString("fen", "")
+                                val san = puzObj.optString("solutionSan", "")
+                                if (fen.isNotBlank() && san.isNotBlank()) {
+                                    customPuzzle = TacticalPuzzle(
+                                        id = puzObj.optString("id", "admin-live-puzzle"),
+                                        title = puzObj.optString("title", "Admin Featured Challenge"),
+                                        theme = puzObj.optString("theme", "Featured"),
+                                        difficulty = puzObj.optString("difficulty", "Featured"),
+                                        fen = fen,
+                                        solutionSan = san,
+                                        hint = puzObj.optString("hint", "Look for the decisive tactical move."),
+                                        explanation = puzObj.optString("explanation", "Featured Admin puzzle solved!")
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -168,6 +188,7 @@ object RemoteConfigManager {
             selectedTheme = selected,
             announcement = announcement,
             updateInfo = resolvedUpdate,
+            customPuzzle = customPuzzle,
             isSyncing = false,
             lastSyncMessage = if (loadedThemes.isNotEmpty() || resolvedUpdate != null) {
                 "Synced with ChoiceCLASH server"

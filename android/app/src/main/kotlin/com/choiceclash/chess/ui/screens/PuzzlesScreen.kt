@@ -21,6 +21,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.choiceclash.chess.chess.ChessBoard
 import com.choiceclash.chess.chess.PieceColor
 import com.choiceclash.chess.chess.PuzzlesRepository
+import com.choiceclash.chess.data.RemoteConfigManager
 import com.choiceclash.chess.ui.components.ChessboardView
 import com.choiceclash.chess.ui.theme.BrushedGold
 import com.choiceclash.chess.ui.theme.CrimsonAlert
@@ -61,13 +63,18 @@ fun PuzzlesScreen() {
     var statusMsg by remember { mutableStateOf<String?>(null) }
     var solvedCurrent by remember { mutableStateOf(false) }
     var is3dMode by remember { mutableStateOf(false) }
+    val remoteState by RemoteConfigManager.state.collectAsState()
 
-    val dailyPuzzles = PuzzlesRepository.dailyPuzzles
+    val dailyPuzzles = remember(remoteState.customPuzzle) {
+        val custom = remoteState.customPuzzle
+        if (custom != null) listOf(custom) + PuzzlesRepository.dailyPuzzles
+        else PuzzlesRepository.dailyPuzzles
+    }
     val activeDaily = dailyPuzzles[dailyIdx.coerceIn(0, dailyPuzzles.lastIndex)]
     val activeMistake = mistakes.getOrNull(mistakeIdx.coerceIn(0, (mistakes.size - 1).coerceAtLeast(0)))
 
     val currentFen = if (tab == PuzzleTab.DAILY) activeDaily.fen else activeMistake?.fen
-    var board by remember(tab, dailyIdx, mistakeIdx, mistakes.size) {
+    var board by remember(tab, dailyIdx, mistakeIdx, mistakes.size, currentFen) {
         mutableStateOf(currentFen?.let { ChessBoard.fromFen(it) } ?: ChessBoard.start())
     }
 

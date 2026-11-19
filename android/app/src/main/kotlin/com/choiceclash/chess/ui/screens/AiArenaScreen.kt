@@ -86,6 +86,8 @@ fun AiArenaScreen() {
     var difficulty by remember { mutableStateOf(AiDifficulty.CLUB) }
     var personality by remember { mutableStateOf(AiPersonality.BALANCED) }
     var playerColor by remember { mutableStateOf(PieceColor.WHITE) }
+    var isPassAndPlay by remember { mutableStateOf(false) }
+    var autoFlipPassAndPlay by remember { mutableStateOf(true) }
     var cameraPreset by remember { mutableStateOf(RpgCameraPreset.ISOMETRIC_RPG) }
     var yawOffset by remember { mutableFloatStateOf(0f) }
     var realmEnvironment by remember { mutableStateOf(RpgRealmEnvironment.EMERALD_COURTYARD) }
@@ -173,9 +175,9 @@ fun AiArenaScreen() {
         }
     }
 
-    // Trigger AI move when it's AI's turn
-    LaunchedEffect(board, playerColor, isGameOver, difficulty, personality) {
-        if (!isGameOver && board.turn != playerColor) {
+    // Trigger AI move when it's AI's turn (disabled in Pass & Play 2-player local mode)
+    LaunchedEffect(board, playerColor, isGameOver, difficulty, personality, isPassAndPlay) {
+        if (!isPassAndPlay && !isGameOver && board.turn != playerColor) {
             aiThinking = true
             delay(220)
             val result = withContext(Dispatchers.Default) {
@@ -222,7 +224,7 @@ fun AiArenaScreen() {
 
     val statusLabel = when {
         timeoutWinner != null -> "${if (timeoutWinner == PieceColor.WHITE) "White" else "Black"} wins on time!"
-        resigned -> "You resigned — AI wins"
+        resigned -> if (isPassAndPlay) "${if (board.turn == PieceColor.WHITE) "Black" else "White"} wins by resignation" else "You resigned — AI wins"
         board.isCheckmate() -> {
             val winner = if (board.turn == PieceColor.WHITE) "Black" else "White"
             "Checkmate! $winner wins"
@@ -230,6 +232,7 @@ fun AiArenaScreen() {
         board.isStalemate() -> "Draw by stalemate"
         board.isGameOver() -> "Draw"
         aiThinking -> "AI (${difficulty.label}) is thinking..."
+        isPassAndPlay -> "${if (board.turn == PieceColor.WHITE) "White (Player 1)" else "Black (Player 2)"} to move${if (board.inCheck()) " • Check!" else ""}"
         board.inCheck() -> "Check! Your move"
         board.turn == playerColor -> "Your turn (${if (playerColor == PieceColor.WHITE) "White" else "Black"})"
         else -> "AI's turn"
@@ -251,7 +254,7 @@ fun AiArenaScreen() {
         ) {
             Column {
                 Text(
-                    text = "AI Arena",
+                    text = if (isPassAndPlay) "2P Pass & Play" else "AI Arena",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = WarmIvory
@@ -263,6 +266,20 @@ fun AiArenaScreen() {
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                FilterChip(
+                    selected = isPassAndPlay,
+                    onClick = {
+                        isPassAndPlay = !isPassAndPlay
+                        resetGame()
+                    },
+                    label = { Text(if (isPassAndPlay) "👥 2P" else "🤖 AI", fontSize = 11.sp, fontWeight = FontWeight.Bold) },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = BrushedGold,
+                        selectedLabelColor = Color(0xFF0B1F17),
+                        containerColor = EmeraldSurface,
+                        labelColor = WarmIvory
+                    )
+                )
                 FilterChip(
                     selected = soundEnabled,
                     onClick = {
@@ -290,18 +307,32 @@ fun AiArenaScreen() {
                         labelColor = BrushedGold
                     )
                 )
-                PieceColor.entries.forEach { side ->
+                if (isPassAndPlay) {
                     FilterChip(
-                        selected = playerColor == side,
-                        onClick = { resetGame(side) },
-                        label = { Text(if (side == PieceColor.WHITE) "♔ White" else "♚ Black", fontSize = 11.sp) },
+                        selected = autoFlipPassAndPlay,
+                        onClick = { autoFlipPassAndPlay = !autoFlipPassAndPlay },
+                        label = { Text("Flip", fontSize = 11.sp) },
                         colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = BrushedGold,
-                            selectedLabelColor = Color(0xFF0B1F17),
+                            selectedContainerColor = EmeraldElevated,
+                            selectedLabelColor = BrushedGold,
                             containerColor = EmeraldSurface,
-                            labelColor = WarmIvory
+                            labelColor = MutedSage
                         )
                     )
+                } else {
+                    PieceColor.entries.forEach { side ->
+                        FilterChip(
+                            selected = playerColor == side,
+                            onClick = { resetGame(side) },
+                            label = { Text(if (side == PieceColor.WHITE) "♔ White" else "♚ Black", fontSize = 11.sp) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = BrushedGold,
+                                selectedLabelColor = Color(0xFF0B1F17),
+                                containerColor = EmeraldSurface,
+                                labelColor = WarmIvory
+                            )
+                        )
+                    }
                 }
             }
         }
@@ -439,17 +470,18 @@ fun AiArenaScreen() {
         // Chessboard
         ChessboardView(
             board = board,
-            flipped = playerColor == PieceColor.BLACK,
+            flipped = if (isPassAndPlay) (autoFlipPassAndPlay && board.turn == PieceColor.BLACK) else (playerColor == PieceColor.BLACK),
             cameraPreset = cameraPreset,
             yawOffset = yawOffset,
             realmEnvironment = realmEnvironment,
-            interactive = !isGameOver && !aiThinking && board.turn == playerColor,
-            allowedColor = playerColor,
+            interactive = !isGameOver && !aiThinking && (isPassAndPlay || board.turn == playerColor),
+            allowedColor = if (isPassAndPlay) board.turn else playerColor,
             lastMoveFrom = lastMoveFrom,
             lastMoveTo = lastMoveTo,
             hintFrom = hintFrom,
             hintTo = hintTo,
             onMoveSelected = { move ->
+                val movingColor = board.turn
                 val san = board.toSan(move)
                 val nextBoard = board.applyMoveUnchecked(move)
                 board = nextBoard
@@ -465,7 +497,7 @@ fun AiArenaScreen() {
                     heroProfile = RpgRepository.awardRewards(context, xpGain = 15, goldGain = 5)
                 }
                 if (timeControl != TimeControl.UNTIMED && timeControl.incrementSec > 0) {
-                    if (playerColor == PieceColor.WHITE) whiteTimeSec += timeControl.incrementSec
+                    if (movingColor == PieceColor.WHITE) whiteTimeSec += timeControl.incrementSec
                     else blackTimeSec += timeControl.incrementSec
                 }
             }
@@ -497,7 +529,7 @@ fun AiArenaScreen() {
         ) {
             OutlinedButton(
                 onClick = {
-                    if (!isGameOver && board.turn == playerColor) {
+                    if (!isGameOver && (isPassAndPlay || board.turn == playerColor)) {
                         scope.launch {
                             val hint = withContext(Dispatchers.Default) {
                                 ChessAiEngine.getBestMove(board, AiDifficulty.MASTER, AiPersonality.BALANCED)
@@ -516,11 +548,12 @@ fun AiArenaScreen() {
             }
             OutlinedButton(
                 onClick = {
-                    if (!aiThinking && boardStack.size >= 3) {
-                        val newStack = boardStack.dropLast(2)
+                    val dropCount = if (isPassAndPlay) 1 else 2
+                    if (!aiThinking && boardStack.size > dropCount) {
+                        val newStack = boardStack.dropLast(dropCount)
                         boardStack = newStack
                         board = newStack.last()
-                        historySan = historySan.dropLast(2)
+                        historySan = historySan.dropLast(dropCount)
                         lastMoveFrom = null
                         lastMoveTo = null
                         hintFrom = null

@@ -23,12 +23,17 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Campaign
+import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material.icons.rounded.Extension
 import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material.icons.rounded.SmartToy
 import androidx.compose.material.icons.rounded.SystemUpdate
+import com.choiceclash.chess.chess.AdventureRepository
+import com.choiceclash.chess.chess.PuzzlesRepository
+import com.choiceclash.chess.chess.RpgRepository
+import com.choiceclash.chess.data.SocketManager
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -432,6 +437,154 @@ fun HomeScreen(
                     )
                 }
             }
+        }
+
+        // Achievement Badges & Global Leaderboard Card
+        val advProgress = remember { AdventureRepository.loadProgress(context) }
+        val puzStats = remember { PuzzlesRepository.loadStats(context) }
+        val rpgHero = remember { RpgRepository.loadProfile(context) }
+        val onlinePlayers by SocketManager.onlinePlayers.collectAsState()
+
+        val badges = remember(advProgress, puzStats, rpgHero) {
+            listOf(
+                Triple("⚔️ First Odyssey Win", "Clear Stage 1 on the Map", advProgress.completedCount >= 1),
+                Triple("🧩 Puzzle Tactician", "Solve 5+ Tactical Puzzles", puzStats.solvedCount >= 5),
+                Triple("🔥 3-Puzzle Streak", "Reach a 3+ puzzle streak", puzStats.bestStreak >= 3),
+                Triple("🏰 Citadel Conqueror", "Reach Stage 4+ on the Map", advProgress.unlockedLevel >= 4),
+                Triple("🛡️ Emerald Paladin", "Reach RPG Hero Level 3+", rpgHero.level >= 3),
+                Triple("👑 Grandmaster Crown", "Complete all 12 Odyssey Stages", advProgress.completedCount >= 12)
+            )
+        }
+
+        val leaderboard = remember(onlinePlayers, rpgHero) {
+            val hallOfFame = listOf(
+                "GM_MagnusCrown" to 2340,
+                "EmeraldWarlord" to 2110,
+                "ObsidianArchmage" to 1945,
+                "CitadelKnight" to 1760,
+                "You (Lv.${rpgHero.level})" to (1200 + rpgHero.xp / 2 + advProgress.totalStars * 15)
+            )
+            val liveEntries = onlinePlayers.map { it.username to it.rating }
+            (liveEntries + hallOfFame)
+                .distinctBy { it.first }
+                .sortedByDescending { it.second }
+                .take(6)
+        }
+
+        Surface(
+            color = EmeraldSurface,
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(1.dp, EmeraldBorder, RoundedCornerShape(16.dp))
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.EmojiEvents,
+                        contentDescription = null,
+                        tint = BrushedGold,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Text(
+                        text = "Achievement Badges (${badges.count { it.third }}/${badges.size})",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = WarmIvory
+                    )
+                }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    badges.forEach { (title, desc, unlocked) ->
+                        Surface(
+                            color = if (unlocked) BrushedGold.copy(alpha = 0.16f) else EmeraldVoid.copy(alpha = 0.6f),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.border(
+                                1.dp,
+                                if (unlocked) BrushedGold else EmeraldBorder.copy(alpha = 0.5f),
+                                RoundedCornerShape(10.dp)
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+                                verticalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                Text(
+                                    text = if (unlocked) "$title ✓" else "🔒 $title",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (unlocked) BrushedGold else MutedSage
+                                )
+                                Text(
+                                    text = desc,
+                                    fontSize = 10.sp,
+                                    color = MutedSage
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Text(
+                    text = "Global Grandmaster Leaderboard",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = BrushedGold,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+                leaderboard.forEachIndexed { idx, (name, rating) ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(EmeraldVoid.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
+                            .padding(horizontal = 10.dp, vertical = 6.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "#${idx + 1}  $name",
+                            fontSize = 12.sp,
+                            fontWeight = if (name.startsWith("You")) FontWeight.Bold else FontWeight.Medium,
+                            color = if (name.startsWith("You")) BrushedGold else WarmIvory
+                        )
+                        Text(
+                            text = "$rating ELO",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = BrushedGold
+                        )
+                    }
+                }
+            }
+        }
+
+        // Google Play Privacy Policy & Data Deletion Link
+        TextButton(
+            onClick = {
+                runCatching {
+                    context.startActivity(
+                        Intent(Intent.ACTION_VIEW, Uri.parse("https://choiceclash.vercel.app/privacy"))
+                    )
+                }
+            },
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            Text(
+                text = "Privacy Policy & Account Data Deletion",
+                fontSize = 11.sp,
+                color = MutedSage
+            )
         }
     }
 }
